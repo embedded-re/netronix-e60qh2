@@ -1,4 +1,4 @@
-# Netronix E60QH2 — reverse engineering and mainline Linux
+# DIBUK Saga (Netronix E60QH2) — reverse engineering and mainline Linux
 
 The Netronix E60QH2 is a 6″ e-ink reader that Slovak Telekom sold under its
 own brand. It has an i.MX6 SoloLite, a 1448×1072 E Ink panel, a zForce IR

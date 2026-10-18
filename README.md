@@ -25,6 +25,27 @@ At boot the reader opens a full-screen e-ink terminal with an on-screen
 keyboard, without X. `gui` starts an Xorg desktop with a touch launcher and a
 PDF/EPUB book reader. See [linux/DESKTOP.md](linux/DESKTOP.md).
 
+## Security as shipped
+
+This reader reached customers with every layer of protection open. You need
+physical access and a USB-UART adapter, and nothing else: no exploit and no
+password.
+
+| Layer | As shipped | Effect |
+|---|---|---|
+| Debug UART | Four UART headers, **clearly labeled on the silkscreen at the top of the PCB**. The console header runs at 115200 8N1 | Easy to find and connect |
+| Bootloader | U-Boot 2009 with `bootdelay=1` and no password. **Ctrl+C** (or any key) at boot stops it at the `eBR-1A #` prompt, which has `fatload`, `bootm`, `loady` and `saveenv` | Boot any kernel from microSD or serial, and change the boot environment |
+| Android build | **Engineering build** (`ro.build.type=eng`, fingerprint `…/eng.hudy.20161221…:eng/V2.1.2.ST.rev.`) with debug tools, `gdbserver` and `strace` | Debug build shipped to customers |
+| Shell | The UART console opens a **root shell** (`root@android:/ #`) at boot, with no login | Full root over serial |
+| ADB | Enabled, with `adbd` **running as root** | Root over USB as well; `adb pull /dev/block/mmcblk0` copies the whole eMMC |
+| Secure boot | OTP boot fuses and SRK hash read as zero, so HAB is not provisioned **[inferred]** | Unsigned images run; the i.MX USB serial downloader works for recovery |
+
+This made the port possible without opening any exploit path. It also means
+that anyone who held the device for a few minutes could read or replace
+everything on it. Details: [docs/stock-android.md](docs/stock-android.md)
+(UART, root, ADB, eMMC dump) and [docs/hardware-map.md](docs/hardware-map.md)
+(U-Boot, fuses).
+
 ## Layout
 
 | Path | Contents |
@@ -49,10 +70,13 @@ waveform from the eMMC dump. Both come from your own device; see
 [linux/README.md](linux/README.md#build). `linux/fetch.sh` downloads the kernel
 and Alpine sources, verifies their checksums, and applies the patches.
 
-## Licenses
+## License
 
-- Kernel patches, the device tree and `linux/drivers/mxc-epdc` are GPL-2.0, as
-  derived from Linux and Andreas Kemnade's EPDC driver.
+Open source. This guide and its code are under the [MIT License](LICENSE),
+except for these parts, which keep their upstream licenses:
+
+- Kernel patches, the device tree and `linux/drivers/mxc-epdc` are GPL-2.0,
+  as derived from Linux and Andreas Kemnade's EPDC driver.
 - `linux/desktop/usr/local/lib/e60/pyte` is pyte 0.8.2 (LGPL-3.0, license
   included).
 - `linux/ref/` holds upstream reference material under its original licenses.

@@ -92,7 +92,7 @@
 
 ### UART 0 — Primary Console (confirmed)
 
-The device exposes clearly labeled UART headers on the PCB. Connecting to the first header immediately yields a root Android shell — no exploit, no authentication, no interaction required.
+The device exposes four UART headers, clearly labeled on the silkscreen at the top of the PCB. Connecting to the first header immediately yields a root Android shell — no exploit, no authentication, no interaction required.
 
 **Connection parameters:** `115200 8N1`  
 **Console device:** `ttymxc0`
@@ -112,6 +112,12 @@ UART header → USB-UART adapter → minicom/screen @ 115200 8N1
 ```
 
 No bootloader interruption needed. Shell is spawned automatically.
+
+The bootloader is just as open: U-Boot waits 1 s (`bootdelay=1`) with no
+password, and **Ctrl+C** (or any key) on the console stops it at the
+`eBR-1A #` prompt. From there you can load and boot your own kernel from the
+microSD (`fatload mmc 1:1 …; bootm …`) or over serial (`loady`), and change
+the environment (`saveenv`). See [hardware-map.md](hardware-map.md).
 
 ### Privilege level
 
@@ -259,6 +265,13 @@ setprop ctl.start surfaceflinger
 
 ## 10. Summary
 
-The device presents essentially no security barrier on its debug interface. The primary UART header provides an unauthenticated root shell on first connection. Combined with ADB being enabled and running as root, full firmware extraction requires no exploitation — only physical access to the PCB headers.
+The device presents essentially no security barrier on its debug interface:
 
-The firmware itself is a 2016 engineering build (`ro.build.type=eng`) with debug tools, gdbserver, and strace left on the system partition, suggesting this was never hardened for consumer deployment.
+- **Labeled UART headers** at the top of the PCB. The console header needs no probing to find.
+- **Unprotected bootloader.** Ctrl+C within the 1 s boot delay stops U-Boot at a prompt that can boot any kernel and rewrite the environment.
+- **Engineering Android build** (`ro.build.type=eng`, built 2016-12-21) with debug tools, `gdbserver` and `strace` left on the system partition.
+- **Root shell on the UART console** at boot, with no login.
+- **ADB enabled and running as root**, so the whole eMMC can be copied with `adb pull`.
+- **No secure boot.** HAB fuses are not provisioned, so unsigned images run.
+
+Full firmware extraction therefore requires no exploitation, only physical access to the PCB headers. The firmware was evidently never hardened for consumer deployment, although it was sold to consumers in this state.

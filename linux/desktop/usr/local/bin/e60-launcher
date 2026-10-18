@@ -1,0 +1,140 @@
+#!/usr/bin/python3
+"""Portrait touch launcher for the E60QH2 X11 desktop."""
+from pathlib import Path
+import os
+import struct
+import subprocess
+import sys
+import time
+import tkinter as tk
+
+sys.path.insert(0, '/usr/local/lib/e60')
+from e60ui import FONT, Tile, full_refresh, fullscreen  # noqa: E402
+
+LIGHT = Path('/sys/class/backlight/backlight')
+BATTERY = Path('/sys/class/power_supply/rn5t618-battery')
+KEY_HOME = 102
+
+root = tk.Tk(className='e60-launcher')
+fullscreen(root, 'E60QH2 — Home')
+children = {}
+status = tk.StringVar()
+
+
+def launch(key, args, wm_class):
+    """Start an app, or raise it if it is already running."""
+    old = children.get(key)
+    if old is not None and old.poll() is None:
+        subprocess.run(['xdotool', 'search', '--limit', '1', '--class', wm_class,
+                        'windowactivate'], check=False)
+        return
+    try:
+        children[key] = subprocess.Popen(args)
+    except OSError as exc:
+        status.set(str(exc))
+
+
+def toggle_keyboard():
+    old = children.get('keyboard')
+    if old is not None and old.poll() is None:
+        old.terminate()
+        return
+    launch('keyboard', ['matchbox-keyboard'], 'matchbox-keyboard')
+
+
+def light(delta):
+    try:
+        maximum = int((LIGHT / 'max_brightness').read_text())
+        value = int((LIGHT / 'brightness').read_text())
+        step = maximum // 10
+        value = max(0, min(maximum, (value + delta * step) // step * step))
+        (LIGHT / 'brightness').write_text(str(value))
+    except (OSError, ValueError, ZeroDivisionError) as exc:
+        status.set(str(exc))
+        return
+    update_status()
+
+
+def update_status():
+    try:
+        percent = (BATTERY / 'capacity').read_text().strip()
+        charging = (BATTERY / 'status').read_text().strip()
+        brightness = int((LIGHT / 'brightness').read_text())
+        maximum = int((LIGHT / 'max_brightness').read_text())
+        text = (f'{time.strftime("%H:%M")}   ·   Battery {percent}% {charging}'
+                f'   ·   Light {brightness * 100 // maximum}%')
+    except (OSError, ValueError) as exc:
+        text = str(exc)
+    if status.get() != text:
+        status.set(text)
+
+
+def show():
+    root.deiconify()
+    root.lift()
+    root.focus_force()
+    update_status()
+
+
+tk.Label(root, text='E60QH2', font=(FONT, 44, 'bold')).pack(pady=(60, 10))
+tk.Label(root, textvariable=status, font=(FONT, 20)).pack(pady=(0, 40))
+
+grid = tk.Frame(root)
+grid.pack(fill='both', expand=True, padx=50, pady=(0, 60))
+tiles = [
+    ('Books', lambda: launch('books', ['/usr/local/bin/e60-reader'], 'e60-reader'), 2),
+    ('Terminal', lambda: launch('terminal', [
+        # 11x23 px cells: 96x46 fills the 1072x1079 area above the keyboard.
+        'xterm', '-class', 'E60Term', '-fa', 'DejaVu Sans Mono', '-fs', '14', '-b', '4',
+        '-bg', 'white', '-fg', 'black', '-geometry', '96x46+0+0'], 'E60Term'), 1),
+    ('Keyboard', toggle_keyboard, 1),
+    ('Light −', lambda: light(-1), 1),
+    ('Light +', lambda: light(1), 1),
+    ('Clean screen', full_refresh, 1),
+    ('Back to terminal', root.destroy, 1),
+]
+row = col = 0
+for label, action, span in tiles:
+    if col + span > 2:
+        row, col = row + 1, 0
+    Tile(grid, label, action, size=30 if span == 2 else 26).grid(
+        row=row, column=col, columnspan=span, padx=14, pady=14, sticky='nsew')
+    col += span
+for index in range(row + 1):
+    grid.rowconfigure(index, weight=1, uniform='rows')
+for index in range(2):
+    grid.columnconfigure(index, weight=1, uniform='cols')
+
+root.protocol('WM_DELETE_WINDOW', lambda: None)
+
+# Observe Home without grabbing the device from Xorg.
+event = struct.Struct('@llHHi')
+try:
+    keys = os.open('/dev/input/e60-buttons', os.O_RDONLY | os.O_NONBLOCK)
+except OSError:
+    keys = None
+if keys is not None:
+    def key_ready(fd, _mask):
+        try:
+            data = os.read(fd, event.size * 32)
+        except BlockingIOError:
+            return
+        if not data:
+            root.deletefilehandler(fd)
+            os.close(fd)
+            return
+        for _, _, kind, code, value in event.iter_unpack(data):
+            if kind == 1 and code == KEY_HOME and value == 1:
+                show()
+    root.createfilehandler(keys, tk.READABLE, key_ready)
+
+
+def reap():
+    for proc in children.values():
+        proc.poll()
+    root.after(5000, reap)
+
+
+update_status()
+reap()
+root.mainloop()

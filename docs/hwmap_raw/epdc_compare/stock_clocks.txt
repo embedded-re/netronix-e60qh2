@@ -1,0 +1,4 @@
+pll5 24000000 0
+epdc_pix 24000000 0
+/sys/kernel/debug/clock/osc_clk/pll2_528_bus_main_clk/pll2_pfd2_400M/epdc_axi_clk 198000000
+0

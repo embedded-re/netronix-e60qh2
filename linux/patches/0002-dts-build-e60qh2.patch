@@ -1,0 +1,15 @@
+Subject: [PATCH] ARM: dts: imx6sl: build the Netronix E60QH2 device tree
+
+The .dts itself lives in dts/ of this repository and is symlinked into
+the kernel tree by fetch.sh.
+
+--- a/arch/arm/boot/dts/nxp/imx/Makefile
++++ b/arch/arm/boot/dts/nxp/imx/Makefile
+@@ -330,6 +330,7 @@
+ dtb-$(CONFIG_SOC_IMX6SL) += \
+ 	imx6sl-evk.dtb \
+ 	imx6sl-kobo-aura2.dtb \
++	imx6sl-netronix-e60qh2.dtb \
+ 	imx6sl-tolino-shine2hd.dtb \
+ 	imx6sl-tolino-shine3.dtb \
+ 	imx6sl-tolino-vision.dtb \

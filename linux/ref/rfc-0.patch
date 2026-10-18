@@ -1,0 +1,69 @@
+From: Andreas Kemnade <andreas@kemnade.info>
+Subject: [RFC PATCH 0/6] drm: EPDC driver for i.MX6
+
+Add a driver for the Electrophoretic Display Controller found in the
+i.MX6 SoCs.
+
+In combination with a driver for an EPD PMIC (like the TPS65185 or the
+SY7636A), it works with the EPDC found in i.MX6SLL based devices and the
+EPDC found in i.MX6SL devices.
+
+Support for waveforms might be limited, there was no 4bit waveform found
+which works with the 6SLL but it works with the vendor waveforms of the
+Kobo Clara HD (6SLL), the Tolino Shine 2/3 (6SL).
+On the 6SL devices, also the epdc_E060SCM.fw works but not as brilliant
+as the vendor one.
+
+It does not involve the PXP yet. The NXP/Freescale kernel fork uses that
+for rotation and mysterious waveform handling. That is not planed to be
+upstreamed in the first step.
+
+Also it does not provide any special userspace API to fine-tune updates.
+That is also IMHO something for a second step.
+
+Andreas Kemnade (6):
+  dt-bindings: display: imx: Add EPDC
+  drm: Add skeleton for EPDC driver
+  drm: mxc-epdc: Add display and waveform initialisation
+  drm: mxc-epdc: Add update management
+  ARM: dts: imx6sll: add EPDC
+  arm: dts: imx6sl: Add EPDC
+
+ .../bindings/display/imx/fsl,mxc-epdc.yaml    |  159 +++
+ arch/arm/boot/dts/imx6sl.dtsi                 |    3 +
+ arch/arm/boot/dts/imx6sll.dtsi                |    9 +
+ drivers/gpu/drm/Kconfig                       |    2 +
+ drivers/gpu/drm/Makefile                      |    1 +
+ drivers/gpu/drm/mxc-epdc/Kconfig              |   15 +
+ drivers/gpu/drm/mxc-epdc/Makefile             |    5 +
+ drivers/gpu/drm/mxc-epdc/epdc_hw.c            |  497 +++++++
+ drivers/gpu/drm/mxc-epdc/epdc_hw.h            |    8 +
+ drivers/gpu/drm/mxc-epdc/epdc_regs.h          |  442 ++++++
+ drivers/gpu/drm/mxc-epdc/epdc_update.c        | 1210 +++++++++++++++++
+ drivers/gpu/drm/mxc-epdc/epdc_update.h        |    9 +
+ drivers/gpu/drm/mxc-epdc/epdc_waveform.c      |  189 +++
+ drivers/gpu/drm/mxc-epdc/epdc_waveform.h      |    7 +
+ drivers/gpu/drm/mxc-epdc/mxc_epdc.h           |  151 ++
+ drivers/gpu/drm/mxc-epdc/mxc_epdc_drv.c       |  373 +++++
+ 16 files changed, 3080 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/display/imx/fsl,mxc-epdc.yaml
+ create mode 100644 drivers/gpu/drm/mxc-epdc/Kconfig
+ create mode 100644 drivers/gpu/drm/mxc-epdc/Makefile
+ create mode 100644 drivers/gpu/drm/mxc-epdc/epdc_hw.c
+ create mode 100644 drivers/gpu/drm/mxc-epdc/epdc_hw.h
+ create mode 100644 drivers/gpu/drm/mxc-epdc/epdc_regs.h
+ create mode 100644 drivers/gpu/drm/mxc-epdc/epdc_update.c
+ create mode 100644 drivers/gpu/drm/mxc-epdc/epdc_update.h
+ create mode 100644 drivers/gpu/drm/mxc-epdc/epdc_waveform.c
+ create mode 100644 drivers/gpu/drm/mxc-epdc/epdc_waveform.h
+ create mode 100644 drivers/gpu/drm/mxc-epdc/mxc_epdc.h
+ create mode 100644 drivers/gpu/drm/mxc-epdc/mxc_epdc_drv.c
+
+-- 
+2.30.2
+
+
+_______________________________________________
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel

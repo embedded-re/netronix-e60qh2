@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+description="E60QH2 touch desktop"
+command="/usr/bin/xinit"
+command_args="/usr/local/bin/e60-session -- /usr/bin/Xorg :0 vt1 -config /etc/X11/e60qh2.conf -nolisten tcp -nocursor"
+command_background=true
+pidfile="/run/e60-desktop.pid"
+output_log="/var/log/e60-desktop.log"
+error_log="/var/log/e60-desktop.log"
+depend() {
+    need localmount
+    after modules
+}
+start_pre() {
+    /usr/local/bin/e60-inputs || return 1
+    export HOME=/root
+}

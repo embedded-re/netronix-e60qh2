@@ -1,0 +1,15 @@
+name=mxc_epdc_fb
+modes=U:1448x1072p-46
+virtual_size=1472,2304
+bits_per_pixel=16
+stride=2944
+rotate=0
+state=0
+pan=0,0
+fb0
+driver
+graphics
+modalias
+power
+subsystem
+uevent

@@ -1,0 +1,35 @@
+Subject: [PATCH] Input: zforce_ts - accept the "neonode_v2" touch state encoding
+
+The zForce in the Netronix E60QH2 (firmware 0001.0000.0000.0001) reports
+touch states 4/5/6 (down/move/up) and numbers contacts from 0, while the
+driver expects 0/1/2 and contacts from 1. The UP state was never seen, so
+BTN_TOUCH and the MT slot stayed pressed forever (and contact 0 selected
+slot -1). Map the offset encoding to the standard one.
+
+Raw point byte 4 captured on the device: 0x04 down, 0x05 move, 0x06 up.
+
+--- a/drivers/input/touchscreen/zforce_ts.c
++++ b/drivers/input/touchscreen/zforce_ts.c
+@@ -75,6 +75,11 @@
+ #define STATE_DOWN			0
+ #define STATE_MOVE			1
+ #define STATE_UP			2
++/*
++ * Some firmware (e.g. Netronix E60QH2, "neonode_v2") reports the states
++ * offset by 4 and numbers the contacts from 0 instead of 1.
++ */
++#define STATE_V2_OFFSET			4
+ 
+ #define SETCONFIG_DUALTOUCH		(1 << 0)
+ 
+@@ -332,6 +337,10 @@
+ 
+ 		point.state = p[4] & 0x0f;
+ 		point.id = (p[4] & 0xf0) >> 4;
++		if (point.state >= STATE_V2_OFFSET) {
++			point.state -= STATE_V2_OFFSET;
++			point.id++;
++		}
+ 
+ 		/* determine touch major, minor and orientation */
+ 		point.area_major = max(p[5], p[6]);

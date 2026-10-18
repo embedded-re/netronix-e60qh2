@@ -1,0 +1,51 @@
+00000000-00003fff : iobase_3d
+  00000000-00000fff : imx_pm.0
+    00000000-00000000 : android ram console
+02020000-02020fff : imx-uart.0
+  02020000-02020fff : imx-uart
+02098000-02098fff : mxs_viim.0
+020bc000-020bffff : imx2-wdt.0
+  020bc000-020bffff : imx2-wdt.0
+020c8000-020c8fff : anatop_thermal.0
+020ec000-020ecfff : imx-sdma
+  020ec000-020ecfff : imx-sdma
+020f0000-020f3fff : imx-pxp
+  020f0000-020f3fff : pxp-mem
+020f4000-020f7fff : imx_epdc_fb
+020fc000-020fdfff : dcp.0
+02141000-02141fff : etb
+0215c000-0215cfff : etm.0
+02184000-021841ff : fsl-ehci.0
+  02184000-021841ff : fsl-usb2-udc
+    02184000-021841ff : fsl-usb2-otg
+02194000-02197fff : sdhci-esdhc-imx.1
+  02194000-02197fff : mmc1
+02198000-0219bfff : sdhci-esdhc-imx.2
+  02198000-0219bfff : mmc2
+0219c000-0219ffff : sdhci-esdhc-imx.3
+  0219c000-0219ffff : mmc0
+021a0000-021a0fff : imx-i2c.0
+  021a0000-021a0fff : imx-i2c
+021a4000-021a4fff : imx-i2c.1
+  021a4000-021a4fff : imx-i2c
+021a8000-021a8fff : imx-i2c.2
+  021a8000-021a8fff : imx-i2c
+021b4000-021b4fff : fsl_rngc.0
+021bc000-021bcfff : mxs_viim.0
+  021bc000-021bc00f : imx-ocotp.0
+  021bc4e0-021bc4e3 : anatop_thermal.0
+021c4000-021c4fff : mxs-perfmon.0
+021c8000-021c8fff : mxs-perfmon.1
+021cc000-021ccfff : mxs-perfmon.2
+02200000-02203fff : iobase_2d
+  02200000-02203fff : galcore register region
+02204000-02207fff : iobase_vg
+  02204000-02207fff : galcore register region
+80000000-9d2fffff : System RAM
+  80000000-80000000 : phys_baseaddr
+  8003a000-806afc53 : Kernel text
+  806b0000-80830acf : Kernel data
+9d300000-9f2fffff : galcore managed memory
+9f95da00-9ffa0fdf : waveform_p
+9ffa1000-9ffffbff : logo_p
+9ffffe00-9ffffe6d : hwcfg_p

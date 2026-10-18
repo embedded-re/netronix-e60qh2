@@ -1,0 +1,18 @@
+/proc/config.gz
+asoc
+audmux
+bdi
+binder
+clock
+extfrag
+gpio
+hid
+memblock
+mmc0
+mmc1
+mmc2
+regulator
+ricoh61x
+usb
+wakeup_sources
+none /sys/kernel/debug debugfs rw,relatime 0 0

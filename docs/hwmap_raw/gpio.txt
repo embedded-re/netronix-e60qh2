@@ -1,0 +1,77 @@
+GPIOs 0-31, gpio-0:
+ gpio-7   (epdc_d0             ) out lo
+ gpio-8   (epdc_d1             ) out lo
+ gpio-9   (epdc_d2             ) out lo
+ gpio-10  (epdc_d3             ) out lo
+ gpio-11  (epdc_d4             ) out lo
+ gpio-12  (epdc_d5             ) out lo
+ gpio-13  (epdc_d6             ) out lo
+ gpio-14  (epdc_d7             ) out lo
+ gpio-15  (epdc_d8             ) out lo
+ gpio-16  (epdc_d9             ) out lo
+ gpio-17  (epdc_d10            ) out lo
+ gpio-18  (epdc_d11            ) out lo
+ gpio-19  (epdc_d12            ) out lo
+ gpio-20  (epdc_d13            ) out lo
+ gpio-21  (epdc_d14            ) out lo
+ gpio-22  (epdc_d15            ) out lo
+ gpio-23  (epdc_sdclk          ) out lo
+ gpio-24  (epdc_sdle           ) out lo
+ gpio-25  (epdc_sdoe           ) out lo
+ gpio-26  (epdc_sdshr          ) out lo
+ gpio-27  (epdc_sdce0          ) out lo
+ gpio-28  (epdc_sdce1          ) out lo
+ gpio-29  (MX6SL_FL_R_EN       ) in  lo
+ gpio-31  (epdc_gdclk          ) out lo
+
+GPIOs 32-63, gpio-1:
+ gpio-32  (epdc_gdoe           ) out lo
+ gpio-33  (epdc_gdrl           ) out lo
+ gpio-34  (epdc_gdsp           ) out lo
+ gpio-35  (tps65185_VCOMCTRL   ) out lo
+ gpio-37  (epdc_bdr0           ) out lo
+ gpio-39  (tps65185_WAKEUP     ) out hi
+ gpio-40  (tps65185_PWRUP      ) out lo
+ gpio-41  (tps65185_INT        ) in  hi
+ gpio-42  (MX6SL_FL_EN         ) out lo
+ gpio-45  (tps65185_PWRGOOD    ) in  lo
+ gpio-46  (tps65185_VIN        ) out hi
+
+GPIOs 64-95, gpio-2:
+ gpio-88  (btn home            ) in  hi
+ gpio-92  (MX6SL_BAT_LOW       ) in  hi
+
+GPIOs 96-127, gpio-3:
+ gpio-98  (MX6SL_HW_ID0        ) in  hi
+ gpio-99  (tps65185_EP_3V3_IN  ) out hi
+ gpio-100 (MX6SL_HW_ID1        ) in  lo
+ gpio-101 (MX6SL_HW_ID3        ) in  lo
+ gpio-102 (MX6SL_HW_ID2        ) in  lo
+ gpio-103 (MX6SL_HW_ID4        ) in  lo
+ gpio-125 (MX6SL_WIFI_3V3      ) in  hi
+ gpio-127 (MX6SL_WIFI_INT      ) in  lo
+
+GPIOs 128-159, gpio-4:
+ gpio-128 (MX6SL_WIFI_RST      ) out lo
+ gpio-130 (ESDHC_CD            ) in  lo
+ gpio-134 (MX6SL_IR_TOUCH_INT  ) in  hi
+ gpio-135 (MX6SL_ON_LED        ) out lo
+ gpio-136 (btn power           ) in  hi
+ gpio-137 (MX6SL_IR_TOUCH_RST  ) in  hi
+ gpio-138 (MX6SL_CHG_LED       ) in  hi
+ gpio-139 (MX6SL_MSP_INT       ) in  hi
+ gpio-140 (TLE4913             ) in  hi
+ gpio-142 (MX6SL_NTX_ACIN_PG   ) in  lo
+ gpio-143 (MX6SL_NTX_CHG       ) in  lo
+ gpio-144 (MX6SL_SD3_DAT2      ) out lo
+ gpio-145 (MX6SL_SD3_DAT3      ) out lo
+ gpio-146 (MX6SL_SD3_CLK       ) out lo
+ gpio-147 (MX6SL_SD3_DAT0      ) out lo
+ gpio-148 (MX6SL_SD3_DAT1      ) out lo
+ gpio-149 (MX6SL_SD3_CMD       ) out lo
+
+GPIOs 160-191, gpio-5:
+
+GPIOs 192-223, gpio-6:
+
+GPIOs 224-228, i2c/2-0032, ricoh619, can sleep:

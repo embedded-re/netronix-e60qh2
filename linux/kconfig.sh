@@ -1,0 +1,16 @@
+#!/bin/bash
+# Apply E60QH2 config on top of imx_v6_v7_defconfig
+set -e
+cd "$(dirname "$0")/src/linux-7.2.11"
+[ -f ../build/.config ] || make ARCH=arm LLVM=1 O=../build imx_v6_v7_defconfig >/dev/null
+C="scripts/config --file ../build/.config"
+$C -e ARM_APPENDED_DTB -e ARM_ATAG_DTB_COMPAT -e ARM_ATAG_DTB_COMPAT_CMDLINE_FROM_BOOTLOADER \
+ --set-str CMDLINE "console=ttymxc0,115200 root=/dev/mmcblk1p2 rootfstype=ext4 rootwait rw loglevel=7" -e CMDLINE_FORCE \
+ -e MFD_NTXEC -e PWM_NTXEC -e RTC_DRV_NTXEC -e MFD_RN5T618 -e REGULATOR_RN5T618 -e RTC_DRV_RC5T619 -e POWER_SUPPLY -e RN5T618_POWER \
+ -e TOUCHSCREEN_ZFORCE -e REGULATOR_TPS65185 -e KEYBOARD_GPIO -e LEDS_GPIO -e LEDS_TRIGGER_TIMER -e LEDS_TRIGGER_HEARTBEAT -e BACKLIGHT_PWM -e PWM \
+ -e MMC_SDHCI_ESDHC_IMX -e CFG80211 -m BRCMFMAC -e BRCMFMAC_SDIO -e WLAN_VENDOR_BROADCOM -e RFKILL \
+ -e DEVMEM -d STRICT_DEVMEM -d IO_STRICT_DEVMEM -e I2C_CHARDEV -e DEBUG_FS -e FTRACE -e FUNCTION_TRACER -e KPROBES -e IKCONFIG -e IKCONFIG_PROC \
+ -e USB_CONFIGFS -e USB_CONFIGFS_ECM -e USB_CONFIGFS_ACM -e USB_CHIPIDEA -e USB_CHIPIDEA_UDC -e USB_CHIPIDEA_HOST -e USB_GADGET \
+ -e DRM -e DRM_FBDEV_EMULATION -e FB -e FW_LOADER -e EXT4_FS -e VFAT_FS -e NLS_CP437 -e NLS_ISO8859_1 -e DMA_CMA -e CMA \
+ -e DEVTMPFS -e DEVTMPFS_MOUNT -d WERROR
+make ARCH=arm LLVM=1 O=../build olddefconfig >/dev/null

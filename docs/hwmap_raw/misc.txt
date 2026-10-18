@@ -1,0 +1,24 @@
+ 47 network_throughput
+ 48 network_latency
+ 49 cpu_dma_latency
+ 50 xt_qtaguid
+ 51 log_system
+ 52 log_radio
+ 53 log_events
+ 54 log_main
+ 55 binder
+236 device-mapper
+130 watchdog
+ 56 alarm
+223 uinput
+  1 psaux
+ 57 usb_accessory
+ 58 mtp_usb
+ 59 android_adb
+200 tun
+ 60 mxs_viim
+134 apm_bios
+ 61 pxp_device
+ 62 ashmem
+190 ntx_io
+ 63 rfkill

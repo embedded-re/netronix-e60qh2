@@ -1,0 +1,12 @@
+#!/bin/sh
+# Leave the e-ink terminal for the X desktop. When the desktop exits
+# (launcher "Back to terminal", or `pkill xinit`), the terminal comes back.
+log=/var/log/e60-desktop.log
+setsid sh -c "
+    rc-service e60-term stop
+    /usr/local/bin/e60-inputs
+    HOME=/root /usr/bin/xinit /usr/local/bin/e60-session -- /usr/bin/Xorg :0 vt1 \
+        -config /etc/X11/e60qh2.conf -nolisten tcp -nocursor
+    rc-service e60-term start
+" </dev/null >>"$log" 2>&1 &
+echo 'Starting the desktop...'

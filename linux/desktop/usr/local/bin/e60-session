@@ -1,0 +1,13 @@
+#!/bin/sh
+export HOME=/root
+xset s off
+xset -dpms
+# Xorg rotates the framebuffer CCW (portrait); rotate touch to match.
+xinput set-prop Touch "Coordinate Transformation Matrix" 0 -1 1 1 0 0 0 0 1
+xsetroot -solid white
+openbox &
+wm=$!
+/usr/local/bin/e60-refreshd &
+refreshd=$!
+trap 'kill "$wm" "$refreshd" 2>/dev/null' EXIT
+/usr/local/bin/e60-launcher

@@ -1,0 +1,528 @@
+U-Boot 2009.08 (máj 10 2016 - 14:31:17)
+
+CPU: Freescale i.MX6 family TO0.0 at 792 MHz
+Temperature:   31 C, calibration data 0x5845025f
+mx6q pll1: 792MHz
+mx6q pll2: 528MHz
+mx6q pll3: 480MHz
+mx6q pll8: 50MHz
+ipg clock     : 66000000Hz
+ipg per clock : 66000000Hz
+uart clock    : 80000000Hz
+cspi clock    : 60000000Hz
+ahb clock     : 132000000Hz
+axi clock   : 198000000Hz
+emi_slow clock: 22000000Hz
+ddr clock     : 396000000Hz
+usdhc1 clock  : 198000000Hz
+usdhc2 clock  : 198000000Hz
+usdhc3 clock  : 198000000Hz
+usdhc4 clock  : 198000000Hz
+Board: MX6SoloLite-NTX:[ WDOG ]
+Boot Device: MMC
+I2C:   ready
+DRAM:  512 MB
+MMC:   ram p=80000000,size=536870912
+csd is 0xd00f0032, 0xf5903ff, 0xfffffdff, 0x8a404000 
+mmc0(part 0) is current device
+
+MMC read: dev # 0, block # 1023, count 1 ... 1 blocks read: OK
+
+MMC read: dev # 0, block # 1024, count 1 ... 1 blocks read: OK
+FSL_USDHC: 0,FSL_USDHC: 1,FSL_USDHC: 2
+hw_anadig_reg_core=7c3e1f
+
+MMC read: dev # 0, block # 34815, count 1 ... 1 blocks read: OK
+
+MMC read: dev # 0, block # 34816, count 759 ... 759 blocks read: OK
+*** Warning - bad CRC or MMC, using default environment
+
+In:    serial
+Out:   serial
+Err:   serial
+ntx_hw_late_init()
+ntx_config_fastboot_layout():7 binaries partition added
+ntx_config_fastboot_layout():9 mbr partition added
+Detecting Magic keys for recovery ...0 0
+Checking for recovery command file...
+mmc0(part 0) is current device
+
+Partition Map for UNKNOWN device 0  --   Partition Type: DOS
+
+Partition     Start Sector     Num Sectors     Type
+    1		     2048	    12224	83
+    2		    38912	    65536	83
+    3		   104448	  3182519	5 Extd
+    4		  3286967	  4413509	b
+    5		   106496	   786416	83
+    6		   894960	   786416	83
+    7		  1683424	  1048560	83
+    8		  2734032	    16368	83
+    9		  2752448	     8176	83
+   10		  2762672	   524289	83
+Writing recovery BCB to misc partition...
+mmc read 0x875ffcbc 0x29b7d0 0x1
+
+MMC read: dev # 0, block # 2734032, count 1 ... 1 blocks read: OK
+Net:   No ethernet found.
+Detecting Magic keys for fastboot ...0 0                                                                                                                                   0 
+
+ hwcfgp=9ffffe00,pcb=51,customer=0
+
+ESDin=1,UPGKey=-1,PWRKey=0,USBin=0x0,BootESD=0
+
+MMC read: dev # 0, block # 14335, count 1 ... 1 blocks read: OK
+[WARNING] Binaries load sequence should Lo->Hi !
+
+MMC read: dev # 0, block # 14336, count 12827 ... 12827 blocks read: OK
+fbmem=6M ,reserved size=13248000
+Kernel RAM visiable size=499M->499M
+
+MMC read: dev # 0, block # 1, count 1 ... 1 blocks read: OK
+hwcfg rootfstype : 2
+hwcfg partition type : 11
+kernel   @ 80808000 (3655024)
+ramdisk  @ 81800000 (177079)
+kernel cmdline: 
+	use uboot command line:
+	console=ttymxc0,115200 init=/init androidboot.console=ttymxc0 max17135:pass=2, fbmem=6M video=mxcepdcfb:E060SCM,bpp=16 no_console_suspend hwcfg_p=0x9ffffe00 hwcfg_sz=110 logo_p=0x9ffa1000 logo_sz=388096 waveform_p=0x9f95da00 waveform_sz=6567392 mem=499M boot_port=3 androidboot.serialno=ST001357 rootfstype=ext4 root=/dev/mmcblk0p1 
+
+Starting kernel ...
+
+Initializing cgroup subsys cpuset
+Initializing cgroup subsys cpu
+Linux version 3.0.35 (hudy@hudy-VirtualBox) (gcc version 4.4.3 (GCC) ) #13 PREEMPT Tue May 10 14:33:07 CEST 2016
+CPU: ARMv7 Processor [412fc09a] revision 10 (ARMv7), cr=10c53c7d
+CPU: VIPT nonaliasing data cache, VIPT aliasing instruction cache
+Machine: Freescale i.MX 6SoloLite NTX Board
+Memory policy: ECC disabled, Data cache writeback
+CPU identified as i.MX6SoloLite, silicon rev 1.2
+Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 118554
+Kernel command line: console=ttymxc0,115200 init=/init androidboot.console=ttymxc0 max17135:pass=2, fbmem=6M video=mxcepdcfb:E060SCM,bpp=16 no_console_suspend hwcfg_p=0x9ffffe00 hwcfg_sz=110 logo_p=0x9ffa1000 logo_sz=388096 waveform_p=0x9f95da00 waveform_sz=6567392 mem=499M boot_port=3 androidboot.serialno=ST001357 rootfstype=ext4 root=/dev/mmcblk0p1
+PID hash table entries: 2048 (order: 1, 8192 bytes)
+Dentry cache hash table entries: 65536 (order: 6, 262144 bytes)
+Inode-cache hash table entries: 32768 (order: 5, 131072 bytes)
+Memory: 467MB = 467MB total
+Memory: 465104k/465104k available, 45872k reserved, 0K highmem
+Virtual kernel memory layout:
+    vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+    fixmap  : 0xfff00000 - 0xfffe0000   ( 896 kB)
+    DMA     : 0xf4600000 - 0xffe00000   ( 184 MB)
+    vmalloc : 0xdf800000 - 0xf2000000   ( 296 MB)
+    lowmem  : 0xc0000000 - 0xdf300000   ( 499 MB)
+    pkmap   : 0xbfe00000 - 0xc0000000   (   2 MB)
+    modules : 0xbf000000 - 0xbfe00000   (  14 MB)
+      .init : 0xc0008000 - 0xc003a000   ( 200 kB)
+      .text : 0xc003a000 - 0xc06afc54   (6616 kB)
+      .data : 0xc06b0000 - 0xc07043a0   ( 337 kB)
+       .bss : 0xc07043c4 - 0xc0830ad0   (1202 kB)
+Preemptible hierarchical RCU implementation.
+NR_IRQS:624
+MXC GPIO hardware
+sched_clock: 32 bits at 24MHz, resolution 41ns, wraps every 178956ms
+arm_max_freq=1GHz
+MXC_Early serial console at MMIO 0x2020000 (options '115200')
+bootconsole [ttymxc0] enabled
+Calibrating delay loop... 1581.05 BogoMIPS (lpj=7905280)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 512
+CPU: Testing write buffer coherency: ok
+hw perfevents: enabled with ARMv7 Cortex-A9 PMU driver, 7 counters available
+print_constraints: dummy: 
+NET: Registered protocol family 16
+print_constraints: vddpu: 725 <--> 1300 mV at 700 mV fast normal 
+print_constraints: vddcore: 725 <--> 1300 mV at 1475 mV fast normal 
+print_constraints: vddsoc: 725 <--> 1300 mV at 1475 mV fast normal 
+print_constraints: vdd2p5: 2000 <--> 2775 mV at 2400 mV fast normal 
+print_constraints: vdd1p1: 800 <--> 1400 mV at 1100 mV fast normal 
+print_constraints: vdd3p0: 2625 <--> 3400 mV at 3000 mV fast normal 
+_parse_cmdline():cp cmdline=console=ttymxc0,115200 init=/init androidboot.console=ttymxc0 max17135:pass=2, fbmem=6M video=mxcepdcfb:E060SCM,bpp=16 no_console_suspend hwcfg_p=0x9ffffe00 hwcfg_sz=110 logo_p=0x9ffa1000 logo_sz=388096 waveform_p=0x9f95da00 waveform_sz=6567392 mem=499M boot_port=3 androidboot.serialno=ST001357 rootfstype=ext4 root=/dev/mmcblk0p1
+hwcfg_size_setup() hwcfg_szie=110
+hwcfg_p_setup() hwcfg_p=9ffffe00,vaddr=df80ee00,size=110,pcb=0x33
+boot_port_setup() boot_port=3
+[_parse_cmdline-274] ram_console_p= not found !!!
+Wifi / BT power control 0
+[_ntx_wifi_power_ctrl-3182] not registered.
+_ntx_wifi_power_ctrl() end.
+[mx6_ntx_init-3795] irq_alloc_descs return 160 for 70 RICOH61x
+ram_console: got buffer at 0, size 1
+ram_console: buffer df816000, invalid size 1, datasize 4294967285
+add wake up source irq 106
+hw-breakpoint: found 6 breakpoint and 1 watchpoint registers.
+hw-breakpoint: 1 breakpoint(s) reserved for watchpoint single-step.
+hw-breakpoint: maximum watchpoint size is 4 bytes.
+L310 cache controller enabled
+l2x0: 16 ways, CACHE_ID 0x410000c8, AUX_CTRL 0x02030000, Cache size: 262144 B
+bio: create slab <bio-0> at 0
+PMU: ricoh61x_regulator_init
+PMU: ricoh61x_i2c_init:
+i2c-core: driver [ricoh619] using legacy suspend method
+i2c-core: driver [ricoh619] using legacy resume method
+SCSI subsystem initialized
+usbcore: registered new interface driver usbfs
+usbcore: registered new interface driver hub
+usbcore: registered new device driver usb
+Freescale USB OTG Driver loaded, $Revision: 1.55 $
+PMU: ricoh61x_i2c_probe:
+PMU: ricoh61x_irq_init: g_full_flag: 0, CHGSTS1: 0x00
+[__ricoh61x_set_s_voltage-151] at 950000uv suspend
+print_constraints: RICOH619_DC1: at 1400 mV normal standby
+print_constraints: RICOH619_DC2: at 3300 mV normal standby
+[__ricoh61x_set_s_voltage-151] at 950000uv suspend
+print_constraints: RICOH619_DC3: 950 <--> 1425 mV at 1425 mV normal standby
+print_constraints: RICOH619_DC4: at 1200 mV normal standby
+print_constraints: RICOH619_DC5: at 1800 mV normal standby
+print_constraints: RICOH619_LDO1: at 3300 mV normal standby
+print_constraints: RICOH619_LDO2: at 3300 mV normal standby
+print_constraints: RICOH619_LDO3: at 1200 mV normal standby
+print_constraints: RICOH619_LDO4: at 1200 mV normal standby
+print_constraints: RICOH619_LDO5: at 3300 mV normal standby
+print_constraints: RICOH619_LDO6: at 600 mV normal standby
+print_constraints: RICOH619_LDO7: at 3300 mV normal standby
+print_constraints: RICOH619_LDO8: at 1800 mV normal standby
+print_constraints: RICOH619_LDO9: at 1200 mV normal standby
+print_constraints: RICOH619_LDO10: at 1400 mV normal standby
+print_constraints: RICOH619_LDORTC1: at 3300 mV normal standby
+print_constraints: RICOH619_LDORTC2: at 3300 mV normal standby
+MIPI CSI2 driver module loaded
+Advanced Linux Sound Architecture Driver Version 1.0.24.
+i2c-core: driver [max17135] using legacy suspend method
+i2c-core: driver [max17135] using legacy resume method
+PMU RTC: ricoh61x_rtc_probe, ricoh61x driver run at 24H-mode
+PMU RTC: we never using periodic function and interrupt
+ricoh61x_rtc_Pon_get_clr, PON=1 -- CTRL2=0x0
+PMU: ricoh61x_rtc_alarm_enable :0
+PMU: ricoh61x_rtc_probe register rtc device
+PMU: ricoh61x_rtc_read_alarm
+rtc_ricoh619 rtc_ricoh619.0: PMU: read alarm: 1/1/2011 0:0:0 *****
+rtc_ricoh619 rtc_ricoh619.0: rtc core: registered rtc_ricoh619 as rtc0
+[ricoh61x_irq_sync_unlock-275] set 0xAE to 0x60
+PMU: ricoh61x_rtc_alarm_enable :0
+RICOH61x RTC Register Success
+Switching to clocksource mxc_timer1
+NET: Registered protocol family 2
+IP route cache hash table entries: 4096 (order: 2, 16384 bytes)
+TCP established hash table entries: 16384 (order: 5, 131072 bytes)
+TCP bind hash table entries: 16384 (order: 4, 65536 bytes)
+TCP: Hash tables configured (established 16384 bind 16384)
+TCP reno registered
+UDP hash table entries: 256 (order: 0, 4096 bytes)
+UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+NET: Registered protocol family 1
+RPC: Registered named UNIX socket transport module.
+RPC: Registered udp transport module.
+RPC: Registered tcp transport module.
+RPC: Registered tcp NFSv4.1 backchannel transport module.
+Trying to unpack rootfs image as initramfs...
+Freeing initrd memory: 172K
+etb: probe of etb failed with error -2
+etm: probe of etm.0 failed with error -2
+Static Power Management for Freescale i.MX6
+wait mode is enabled for i.MX6
+cpaddr = 0 suspend_iram_base=f2900000
+PM driver module loaded
+SD2 DSE set to 34 ohm 
+IMX usb wakeup probe
+add wake up source irq 75
+cpu regulator mode:ldo_enable
+i.MXC CPU frequency driver
+ashmem: initialized
+msgmni has been set to 908
+io scheduler noop registered
+io scheduler deadline registered
+io scheduler cfq registered (default)
+drivers/video/mxc/mxc_epdc_fb.c(6731):EPD 1448x1072 
+-> requested panel string E060SCM
+-> epdc modes[0] - E60SC8
+-> epdc modes[1] - E60_V110
+-> epdc modes[2] - E60XC5
+-> epdc modes[3] - E60XC1
+-> epdc modes[4] - ED050XXXX
+-> epdc modes[5] - ED068TG1
+-> epdc modes[6] - PENG060D
+-> epdc modes[7] - EF133UT1SCE
+-> epdc modes[8] - E60SCQ
+-> epdc modes[9] - ED078KH1
+waveform_size_setup() wf_size=6567392
+waveform_p_setup() wf_p=9f95da00,vaddr=e0000a00,size=6567392
+logo_size_setup() logo_szie=388096
+logo_p_setup() logo_p=9ffa1000,vaddr=df880000,size=388096
+[epdc_firmware_work_func]:fw p=e0000a00,size=6567392,fb_data@da1f6000,pdata=da0f9e80
+drivers/video/mxc/mxc_epdc_fb.c(6222):EPD 1448x1072 
+imx_epdc_fb imx_epdc_fb:  --- Extra Waveform Data length: 29 bytes---
+imx-sdma imx-sdma: loaded firmware 1.1
+imx_epdc_fb imx_epdc_fb:      Extra Waveform Data: 320_R057_AF2701_ED060KG1U1_TC�
+imx-sdma imx-sdma: initialized
+fake_s1d13522_parse_epd_cmdline : epd cmdline parse already done .
+client0@i2c2 ,addr=0x68,name=tps65185-1
+drivers/video/mxc/lk_tps65185.c(1087): EP_3V3 ON/OFF control enabled !EP3V3 OFF ticks=800
+TPS65185 versions : major=0x1,minor=0x2,version=0x5,RevID=0x65
+[tps65185_init-1139] gpio_to_irq ()
+TPS65185 temprature data = 0x16,22
+Serial: IMX driver
+imx-uart.0: ttymxc0 at MMIO 0x2020000 (irq = 58) is a IMX
+console [ttymxc0] enabled, bootconsole disabled
+console [ttymxc0] enabled, bootconsole disabled
+brd: module loaded
+loop: module loaded
+[msp430_i2c_probe-1330] firmware version F110
+msp430_i2c_probe, regulator found on channel 0
+add wake up source irq 103
+i2c-core: driver [msp430] using legacy suspend method
+i2c-core: driver [msp430] using legacy resume method
+PPP generic driver version 2.4.2
+PPP Deflate Compression module registered
+PPP BSD Compression module registered
+PPP MPPE Compression module registered
+NET: Registered protocol family 24
+PPTP driver version 0.8.5
+tun: Universal TUN/TAP device driver, 1.6
+tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+fsl-ehci fsl-ehci.0: Freescale On-Chip EHCI Host Controller
+fsl-ehci fsl-ehci.0: new USB bus registered, assigned bus number 1
+fsl-ehci fsl-ehci.0: irq 75, io base 0x02184000
+fsl-ehci fsl-ehci.0: USB 2.0 started, EHCI 1.00
+hub 1-0:1.0: USB hub found
+hub 1-0:1.0: 1 port detected
+usbcore: registered new interface driver cdc_acm
+cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
+Initializing USB Mass Storage driver...
+usbcore: registered new interface driver usb-storage
+USB Mass Storage support registered.
+usbcore: registered new interface driver usbserial
+usbserial: USB Serial Driver core
+USB Serial support registered for GSM modem (1-port)
+usbcore: registered new interface driver option
+option: v0.7.2:USB Driver for GSM modems
+USB Serial support registered for Qualcomm USB modem
+usbcore: registered new interface driver qcserial
+ARC USBOTG Device Controller driver (1 August 2005)
+my_batt_ext_power_changed!
+It is not usb supply!
+adb_setup
+android_usb gadget: Mass Storage Function, version: 2009/09/11
+android_usb gadget: Number of LUNs=1
+ lun0: LUN: removable file: (no medium)
+Gadget Android: controller 'fsl-usb2-udc' not recognized
+android_usb gadget: android_usb ready
+Suspend udc for OTG auto detect
+fsl-usb2-udc: bind to driver android_usb 
+mousedev: PS/2 mouse device common for all mice
+input: gpio-keys as /devices/platform/gpio-keys/input/input0
+[__zForce_ir_touch_init-143] zForce controller with v2 command sets.
+[zForce_ir_touch_probe-928] Set touch resolution 1448x1072
+input: zForce-ir-touch as /devices/virtual/input/input1
+i2c-core: driver [zforce-ir-touch] using legacy suspend method
+i2c-core: driver [zforce-ir-touch] using legacy resume method
+i2c-core: driver [elan-touch] using legacy suspend method
+i2c-core: driver [elan-touch] using legacy resume method
+[Waltop]-waltop_I2C_init: Waltop I2C Pen Driver (Built Dec  9 2015 @ 09:46:09)
+[zForce_ir_touch_recv_data-295] command BootComplete (00)...
+i2c-core: driver [waltop_i2c] using legacy suspend method
+i2c-core: driver [waltop_i2c] using legacy resume method
+[Waltop]-waltop_I2C_init: Pen i2c driver add Success
+i2c-core: driver [kl25] using legacy suspend method
+i2c-core: driver [kl25] using legacy resume method
+using rtc device, rtc_ricoh619, for alarms
+i2c /dev entries driver
+Linux video capture interface: v2.00
+PMU: ricoh61x_battery_init
+PMU: ricoh61x_battery_probe : version is RICOH61x_BATTERY_VERSION: 2014.02.21 V3.1.0.0-Solution1 2015/02/09
+ricoh61x_battery_probe type_n=0,temp is 1
+ricoh61x_battery_probe info->num=0,temp is 2
+PMU FG_RESET : ricoh61x_init_battery : initial pswr = 97
+PMU : ricoh61x_init_battery : POWER off history 0x0a is 0x10 
+PMU : ricoh61x_init_battery : POWER control function 0x0d is 0x20 
+PMU : ricoh61x_init_battery : off is 492758, on is 492758, period is 0, fpon_flag is 0
+PMU: ricoh61x_set_OCV_table : 00% voltage = 3579900 uV
+PMU: ricoh61x_set_OCV_table : 10% voltage = 3687400 uV
+PMU: ricoh61x_set_OCV_table : 20% voltage = 3743500 uV
+PMU: ricoh61x_set_OCV_table : 30% voltage = 3768000 uV
+PMU: ricoh61x_set_OCV_table : 40% voltage = 3788700 uV
+PMU: ricoh61x_set_OCV_table : 50% voltage = 3818000 uV
+PMU: ricoh61x_set_OCV_table : 60% voltage = 3879100 uV
+PMU: ricoh61x_set_OCV_table : 70% voltage = 3941300 uV
+PMU: ricoh61x_set_OCV_table : 80% voltage = 4004800 uV
+PMU: ricoh61x_set_OCV_table : 90% voltage = 4083000 uV
+PMU: ricoh61x_set_OCV_table : 100% voltage = 4183100 uV
+PMU : ricoh61x_set_OCV_table : target_vsys is 3012 target_ibat is 302
+PMU : ricoh61x_scaling_OCV_table : setting value of cuttoff_vol(3092) is out of range(3579900) 
+PMU : ricoh61x_scaling_OCV_table : new table
+PMU : ricoh61x_scaling_OCV_table : ocv_table 0 is 35788 v
+PMU : ricoh61x_scaling_OCV_table : ocv_table 1 is 36850 v
+PMU : ricoh61x_scaling_OCV_table : ocv_table 2 is 37411 v
+PMU : ricoh61x_scaling_OCV_table : ocv_table 3 is 37668 v
+[zForce_ir_touch_recv_data-358] firmware version 0001 0000 0000 0001 
+PMU : ricoh61x_scaling_OCV_table : ocv_table 4 is 37875 v
+PMU : ricoh61x_scaling_OCV_table : ocv_table 5 is 38168 v
+[zForce_ir_touch_recv_data-369] Interface protocol: major=0x00, minor=0x00
+PMU : ricoh61x_scaling_OCV_table : ocv_table 6 is 38779 v
+PMU : ricoh61x_scaling_OCV_table : ocv_table 7 is 39389 v
+PMU : ricoh61x_scaling_OCV_table : ocv_table 8 is 40037 v
+PMU : ricoh61x_scaling_OCV_table : ocv_table 9 is 40818 v
+PMU : ricoh61x_scaling_OCV_table : ocv_table 10 is 41819 v
+PMU : ricoh61x_init_charger : GCHGDET (0xDA) is 0x0
+PMU : ricoh61x_init_charger : after CHGISET_REG (0xb8) is 0x4 info->ch_ichg is 0xff info->ch_icchg is 0x0
+PMU : ricoh61x_init_charger : before BATSET1_REG (0xba) is 0x49 info->ch_vbatovset is 0xff
+PMU : ricoh61x_init_charger : after BATSET1_REG (0xba) is 0x49 info->ch_vbatovset is 0xff
+PMU : ricoh61x_init_charger : before BATSET2_REG (0xbb) is 0x31 info->ch_vrchg is 0xff info->ch_vfchg is 0xff 
+PMU : ricoh61x_init_charger : test test val 48, val2 3 vfchg 4200
+PMU : ricoh61x_init_charger : test test val 0, val2 0 icchg 50
+PMU : ricoh61x_init_charger : 100 min 4127000, 100 max 4251000 vfchg 4200 icchg 50 rbat 211
+PMU: ricoh61x_init_fgsoca : * 00% voltage = 3578700 uV
+PMU: ricoh61x_init_fgsoca : * 10% voltage = 3684900 uV
+PMU: ricoh61x_init_fgsoca : * 20% voltage = 3741100 uV
+PMU: ricoh61x_init_fgsoca : * 30% voltage = 3766700 uV
+PMU: ricoh61x_init_fgsoca : * 40% voltage = 3787500 uV
+PMU: ricoh61x_init_fgsoca : * 50% voltage = 3816800 uV
+PMU: ricoh61x_init_fgsoca : * 60% voltage = 3877800 uV
+PMU: ricoh61x_init_fgsoca : * 70% voltage = 3938900 uV
+PMU: ricoh61x_init_fgsoca : * 80% voltage = 4003600 uV
+PMU: ricoh61x_init_fgsoca : * 90% voltage = 4081800 uV
+PMU: ricoh61x_init_fgsoca : * 100% voltage = 4181900 uV
+PMU: ricoh61x_init_fgsoca : * Rbat = 211 mOhm   n_cap = 1510 mAH
+i2c-core: driver [mag3110] using legacy suspend method
+i2c-core: driver [mag3110] using legacy resume method
+imx2-wdt imx2-wdt.0: IMX2+ Watchdog Timer enabled. timeout=60s (nowayout=1)
+device-mapper: uevent: version 1.0.3
+device-mapper: ioctl: 4.20.0-ioctl (2011-02-02) initialised: dm-devel@redhat.com
+sdhci: Secure Digital Host Controller Interface driver
+sdhci: Copyright(c) Pierre Ossman
+mmc0: no vmmc regulator found
+mmc0: SDHCI controller on platform [sdhci-esdhc-imx.3] using DMA
+sdhci sdhci-esdhc-imx.1: no write-protect pin available!
+mmc1: no vmmc regulator found
+mmc1: SDHCI controller on platform [sdhci-esdhc-imx.1] using DMA
+[ntx_register_wifi_cd-3051] register g_cd_irq 
+mmc2: no vmmc regulator found
+mmc2: SDHCI controller on platform [sdhci-esdhc-imx.2] using DMA
+revserved_memory_account:viv_gpu registerd
+Thermal calibration data is 0x5845025f
+Thermal sensor with ratio = 183
+Anatop Thermal registered as thermal_zone0
+anatop_thermal_probe: default cooling device is cpufreq!
+usbcore: registered new interface driver usbhid
+usbhid: USB HID core driver
+logger: created 256K log 'log_main'
+logger: created 256K log 'log_events'
+logger: created 256K log 'log_radio'
+logger: created 256K log 'log_system'
+usbcore: registered new interface driver snd-usb-audio
+ALSA device list:
+  No soundcards found.
+Netfilter messages via NETLINK v0.30.
+nf_conntrack version 0.5.0 (7269 buckets, 29076 max)
+ctnetlink v0.93: registering with nfnetlink.
+NF_TPROXY: Transparent proxy support initialized, version 4.1.0
+NF_TPROXY: Copyright (c) 2006-2007 BalaBit IT Ltd.
+xt_time: kernel timezone is -0000
+IPv4 over IPv4 tunneling driver
+mmc0: new high speed DDR MMC card at address 0001
+GRE over IPv4 demultiplexor driver
+ip_tables: (C) 2000-2006 Netfilter Core Team
+arp_tables: (C) 2002 David S. Miller
+mmcblk0: mmc0:0001 SEM04G 3.68 GiB 
+TCP cubic registered
+NET: Registered protocol family 10
+ mmcblk0: p1 p2 p3 < p5 p6 p7 p8 p9 p10 > p4
+ip6_tables: (C) 2000-2006 Netfilter Core Team
+IPv6 over IPv4 tunneling driver
+NET: Registered protocol family 17
+NET: Registered protocol family 15
+L2TP core driver, V2.0
+PPPoL2TP kernel driver, V2.0
+L2TP IP encapsulation support (L2TPv3)
+L2TP netlink interface
+L2TP ethernet pseudowire support (L2TPv3)
+lib80211: common routines for IEEE802.11 drivers
+VFP support v0.3: implementor 41 architecture 3 part 30 variant 9 rev 4
+Bus freq driver module loaded
+Bus freq driver Enabled
+DVFS driver module loaded
+rtc_ricoh619 rtc_ricoh619.0: setting system clock to 2026-03-19 14:54:40 UTC (1773932080)
+Freeing init memory: 200K
+init (1): /proc/1/oom_adj is deprecated, please use /proc/1/oom_score_adj instead.
+mmc1: host does not support reading read-only switch. assuming write-enable.
+mmc1: new high speed SDHC card at address 1234
+mmcblk1: mmc1:1234 SA16G 14.4 GiB 
+ mmcblk1: p1 p2
+logo skip : logosize 388096 < 776128 !! 
+ 
+[PROGRESS_BAR-3083] No progess ...
+init: cannot open '/initlogo.rle'
+EXT4-fs (mmcblk0p5): warning: maximal mount count reached, running e2fsck is recommended
+EXT4-fs (mmcblk0p5): mounted filesystem with ordered data mode. Opts: (null)
+EXT4-fs (mmcblk0p5): re-mounted. Opts: (null)
+EXT4-fs (mmcblk0p7): warning: maximal mount count reached, running e2fsck is recommended
+EXT4-fs (mmcblk0p7): mounted filesystem with ordered data mode. Opts: noauto_da_alloc
+EXT4-fs (mmcblk0p6): warning: maximal mount count reached, running e2fsck is recommended
+EXT4-fs (mmcblk0p6): mounted filesystem with ordered data mode. Opts: (null)
+EXT4-fs (mmcblk0p8): mounted filesystem with ordered data mode. Opts: (null)
+EXT4-fs (mmcblk0p10): VFS: Can't find ext4 filesystem
+init: cannot find '/system/bin/gpu_init.sh', disabling 'gpu_init'
+init: cannot find '/system/etc/install-recovery.sh', disabling 'flash_recovery'
+android_usb: already disabled
+mtp_bind_config
+adb_open
+adb_bind_config
+root@android:/ # PMU calc_capacity_in_period 1%FACAP(54360)[mAs], cc_sum(36887)[mAs], cc_sum_dec(36887)
+PMU: ricoh61x_displayed_work : dsoc_temp(9700), soc(9700), cc_delta(67)
+PMU: ricoh61x_displayed_work : status(0), rsoc_ready_flag(0)
+PMU:check_charge_status_2 2nd P-On init_pswr(97), cc(67)
+PMU calc_capacity_in_period 1%FACAP(54360)[mAs], cc_sum(36887)[mAs], cc_sum_dec(36887)
+PMU: ricoh61x_displayed_work Half-Clear CC, init_pswr(97), cc_delta(67)
+warning: `zygote' uses 32-bit capabilities (legacy support in use)
+request_suspend_state: wakeup (3->0) at 15268127254 (2026-03-19 14:54:53.659672545 UTC)
+
+set front light level : 7
+Set front light Frequency : 20000
+Set front light duty : 119
+[fl_pwr_enable-65] regulator on
+[drivers/input/touchscreen/zforce_i2c.c-816] zforce_i2c_open()
+[zForce_ir_touch_recv_data-240] command Activate (0) ...
+[zForce_ir_touch_recv_data-267] command Resolution (0) ...
+[zForce_ir_touch_recv_data-298] command Frequency (0) ...
+[zForce_ir_touch_recv_data-277] command Configuration ...
+Wifi / BT power control 1
+acc_open
+acc_release
+_ntx_wifi_power_ctrl() end.
+
+Dongle Host Driver, version 5.90.125.120.1
+Compiled in drivers/net/wireless/bcmdhd on Dec  9 2015 at 09:47:44
+mmc2: queuing unknown CIS tuple 0x80 (2 bytes)
+mmc2: queuing unknown CIS tuple 0x80 (3 bytes)
+mmc2: queuing unknown CIS tuple 0x80 (3 bytes)
+mmc2: queuing unknown CIS tuple 0x80 (7 bytes)
+mmc2: queuing unknown CIS tuple 0x80 (8 bytes)
+mmc2: queuing unknown CIS tuple 0x80 (2 bytes)
+mmc2: queuing unknown CIS tuple 0x80 (5 bytes)
+mmc2: queuing unknown CIS tuple 0x80 (5 bytes)
+mmc2: new high speed SDIO card at address 0001
+dhd_customer_oob_irq_map: customer specific Host GPIO number is (127)
+dhd_customer_oob_irq_map: customer specific Host GPIO irq number is (383)
+[bcmsdh_probe-241] IRQ=383 Type=414 
+F1 signature read @0x18000000=0x1591a962
+DHD: dongle ram size is set to 245760(orig 245760)
+wl_iw_attach thr:8f7 started
+wl_iw_bt_init thr:8f9 started
+dhd_attach thr:8fa started
+dhd_attach thr:8fb started
+dhd_attach thr:8fc started
+Broadcom Dongle Host Driver: register interface [wlan0] MAC: 00:90:4c:11:22:33
+dhdsdio_write_vars: Download, Upload and compare of NVRAM succeeded.
+[bcmsdh_register_oob_intr-634] IRQ=383 Type=414 
+add wake up source irq 105
+Firmware up: op_mode=1, Broadcom Dongle Host Driver mac=<wifi-mac>
+Firmware version = wl0: Apr 11 2014 17:50:29 version 5.90.195.89.23 FWID 01-83cee08a
+Unknown PRIVATE command BTCOEXSCAN-STOP - ignored
+Unknown PRIVATE command RXFILTER-ADD 3 - ignored
+Unknown PRIVATE command RXFILTER-START - ignored
+Unknown PRIVATE command RXFILTER-STOP - ignored
+Unknown PRIVATE command RXFILTER-REMOVE 2 - ignored
+Unknown PRIVATE command RXFILTER-START - ignored
+wl_iw_set_essid: join SSID=<SSID> ch=6
+FL PWM off command
+[FL_off_func-1569]FL PWR off
+[fl_pwr_enable-65] regulator off

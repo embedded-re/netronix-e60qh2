@@ -1,0 +1,8 @@
+0
+anaclk_1
+anaclk_2
+ckih2_clk
+ckih_clk
+ckil_clk
+gpu2d_core_clk
+osc_clk

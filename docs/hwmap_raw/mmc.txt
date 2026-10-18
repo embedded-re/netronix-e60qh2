@@ -1,0 +1,36 @@
+/sys/class/mmc_host/mmc0/mmc0:0001
+MMC
+SEM04G
+0x000045
+0x0100
+45010053454d3034473a434526ab7200
+07/1999
+/sys/class/mmc_host/mmc1/mmc1:1234
+SD
+SA16G
+0x000002
+0x544d
+02544d534131364719190a9f92011500
+05/2017
+/sys/class/mmc_host/mmc2/mmc*
+clock:		52000000 Hz
+vdd:		17 (2.9 ~ 3.0 V)
+bus mode:	2 (push-pull)
+chip select:	0 (don't care)
+power mode:	2 (on)
+bus width:	3 (8 bits)
+timing spec:	5 (invalid)
+clock:		50000000 Hz
+vdd:		17 (2.9 ~ 3.0 V)
+bus mode:	2 (push-pull)
+chip select:	0 (don't care)
+power mode:	2 (on)
+bus width:	2 (4 bits)
+timing spec:	2 (sd high-speed)
+clock:		0 Hz
+vdd:		0 (invalid)
+bus mode:	1 (open drain)
+chip select:	0 (don't care)
+power mode:	0 (off)
+bus width:	0 (1 bits)
+timing spec:	0 (legacy)

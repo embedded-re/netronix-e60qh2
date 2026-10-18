@@ -1,0 +1,3 @@
+#!/bin/sh
+# cfg80211 is built in and first requests this before the SD root is mounted.
+/usr/sbin/iw reg reload

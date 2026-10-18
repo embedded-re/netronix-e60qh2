@@ -1,0 +1,10 @@
+# /etc/inittab (E60QH2)
+::sysinit:/sbin/openrc sysinit
+::sysinit:/sbin/openrc boot
+::wait:/sbin/openrc default
+
+# Root shell on the UART console (debug board, physical access only)
+ttymxc0::respawn:/bin/login -f root
+
+::ctrlaltdel:/sbin/reboot
+::shutdown:/sbin/openrc shutdown

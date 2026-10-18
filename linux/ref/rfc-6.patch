@@ -1,0 +1,34 @@
+From: Andreas Kemnade <andreas@kemnade.info>
+Subject: [RFC PATCH 6/6] arm: dts: imx6sl: Add EPDC
+
+Extend definition of EPDC.
+
+Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
+---
+ arch/arm/boot/dts/imx6sl.dtsi | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm/boot/dts/imx6sl.dtsi b/arch/arm/boot/dts/imx6sl.dtsi
+index c7d907c5c352..919e86e4fc74 100644
+--- a/arch/arm/boot/dts/imx6sl.dtsi
++++ b/arch/arm/boot/dts/imx6sl.dtsi
+@@ -765,8 +765,11 @@ pxp: pxp@20f0000 {
+ 			};
+ 
+ 			epdc: epdc@20f4000 {
++				compatible = "fsl,imx6sl-epdc";
+ 				reg = <0x020f4000 0x4000>;
+ 				interrupts = <0 97 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&clks IMX6SL_CLK_EPDC_AXI>, <&clks IMX6SL_CLK_EPDC_PIX>;
++				clock-names = "axi", "pix";
+ 			};
+ 
+ 			lcdif: lcdif@20f8000 {
+-- 
+2.30.2
+
+
+_______________________________________________
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel

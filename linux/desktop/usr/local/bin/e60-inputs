@@ -1,0 +1,14 @@
+#!/bin/sh
+# Stable names for the E60QH2 input devices and no fbcon on the panel.
+for input in /sys/class/input/event*; do
+    case "$(cat "$input/device/name")" in
+        "Neonode zForce touchscreen") ln -sf "/dev/input/${input##*/}" /dev/input/e60-touch ;;
+        "gpio-keys") ln -sf "/dev/input/${input##*/}" /dev/input/e60-buttons ;;
+    esac
+done
+for vt in /sys/class/vtconsole/vtcon*; do
+    case "$(cat "$vt/name")" in
+        *"frame buffer"*) echo 0 > "$vt/bind" ;;
+    esac
+done
+test -e /dev/fb0 && test -e /dev/input/e60-touch

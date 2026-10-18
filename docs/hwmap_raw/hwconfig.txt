@@ -1,0 +1,109 @@
+ntx_hwconfig_ap.c(478):Hw config header check error (-4)!
+HW CONFIG v2.6 @1024 secno, size=62 bytes : 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[0] PCB='E60QH0' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[1] KeyPad='HOME_Key' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[2] AudioCodec='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[3] AudioAmp='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[4] Wifi='WC121A2' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[5] BT='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[6] Mobile='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[7] TouchCtrl='neonode_v2' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[8] TouchType='IR-Type' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[9] DisplayCtrl='MX6SL+TPS65185' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[10] DisplayPanel='6" Bottom EPD' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[11] RSensor='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[12] MicroP='MSP430' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[13] Customer='No Brand' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[14] Battery='1500mA' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[15] Led='G' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[16] RamSize='512MB' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[17] IFlash='eMMC' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[18] ExternalMem='Micro SD' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[19] RootFsType='Ext4' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[20] SysPartType='TYPE12' 
+[21] ProgressXHiByte=0x01 
+[22] ProgressXLoByte=0x68 
+[23] ProgressYHiByte=0x02 
+[24] ProgressYLoByte=0xE4 
+[25] ProgressCnts=0x00 
+[26] ContentType=0x00 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[27] CPU='mx6sl' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[28] UIStyle='Android' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[29] RAMType='LPDDR2' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[30] UIConfig='Normal' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[31] DisplayResolution='1448x1072' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[32] FrontLight='TABLE11+' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[33] CPUFreq='NC' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[34] HallSensor='TLE4913' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[35] DisplayBusWidth='8Bits' 
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[36] FrontLight_Flags=BootON:OFF,TABLE1X:OFF,EN_INV:ON
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[37] PCB_Flags=NO_KeyMatrix:ON,FPC_Touch:OFF,LOGO_LED:OFF,RD_MODE:OFF,EPD_LV:ON,EPDVDD_STDALONE:OFF
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[38] FrontLight_LEDrv='SY7201' 
+[39] VCOM_10mV_HiByte=0x00 
+[40] VCOM_10mV_LoByte=0x00 
+[41] PCB_REV=0x00 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[42] PCB_LVL='A' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[43] HOME_LED_PWM='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[44] PMIC='RC5T619' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[45] FL_PWM='MSP430' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[46] RTC='RC5T619' 
+NtxHwCfg_GetCfgFldVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[47] BootOpt=ESD:OFF
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[48] Touch2Ctrl='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[49] Touch2Type='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[50] GPS='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[51] FM='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[52] RSensor2='No' 
+NtxHwCfg_GetCfgFldStrVal:[WARNING]Config version too new !! Please update hardware config tool !!
+[53] LightSensor='No' 
+command hwcfg fail !!

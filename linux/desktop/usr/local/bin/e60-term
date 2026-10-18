@@ -1,0 +1,438 @@
+#!/usr/bin/python3
+"""Full-screen e-ink terminal with an on-screen keyboard for the E60QH2.
+
+Runs without X: draws on /dev/fb0 in portrait (1072x1448, the panel rotated
+CCW like the X desktop), reads the zForce directly and runs a root shell on
+a pty. White on black, no anti-aliasing, so the EPDC uses the fast DU mode.
+
+Keyboard: Shift is one-shot (tap twice for caps lock), Ctrl and Alt are
+one-shot. ⟳ does a full GC16 refresh. Swipe down/up on the text for
+scrollback. Type `gui` to start the X desktop; leaving it comes back here.
+"""
+import errno
+import fcntl
+import mmap
+import os
+import pty
+import select
+import signal
+import struct
+import sys
+import termios
+import time
+
+sys.path.insert(0, '/usr/local/lib/e60')
+import pyte  # noqa: E402
+from PIL import Image, ImageDraw, ImageFont  # noqa: E402
+
+W, H = 1072, 1448             # portrait
+FW, FH = 1448, 1072           # native framebuffer
+EPDC = '/sys/devices/platform/soc/2000000.bus/20f4000.epdc'
+FONT = '/usr/share/fonts/dejavu/DejaVuSansMono.ttf'
+FONT_PX = int(os.environ.get('E60_TERM_FONT', '22'))
+KB_H = 470
+BG, FG = 0, 255
+IDLE_CLEAN = 3.0              # s without activity before ghosting cleanup
+CLEAN_AFTER = 40              # partial updates that justify a full refresh
+REPEAT_DELAY, REPEAT_RATE = 0.5, 0.12
+EVENT = struct.Struct('@llHHi')
+EV_SYN, EV_KEY, EV_ABS = 0, 1, 3
+ABS_X, ABS_Y, BTN_TOUCH = 0, 1, 0x14a
+
+ESC = '\x1b'
+DECCKM = 1 << 5               # application cursor keys (pyte private-mode encoding)
+# (label, normal, shifted, width); special keys have normal=None and are
+# handled by name.
+ROWS = [
+    [('`', '`', '~', 1), ('1', '1', '!', 1), ('2', '2', '@', 1), ('3', '3', '#', 1),
+     ('4', '4', '$', 1), ('5', '5', '%', 1), ('6', '6', '^', 1), ('7', '7', '&', 1),
+     ('8', '8', '*', 1), ('9', '9', '(', 1), ('0', '0', ')', 1), ('-', '-', '_', 1),
+     ('=', '=', '+', 1), ('⌫', None, None, 1.5)],
+    [('Tab', None, None, 1.5)] + [(c, c, c.upper(), 1) for c in 'qwertyuiop'] +
+    [('[', '[', '{', 1), (']', ']', '}', 1), ('\\', '\\', '|', 1)],
+    [('Esc', None, None, 1.75)] + [(c, c, c.upper(), 1) for c in 'asdfghjkl'] +
+    [(';', ';', ':', 1), ("'", "'", '"', 1), ('Enter', None, None, 1.75)],
+    [('Shift', None, None, 2)] + [(c, c, c.upper(), 1) for c in 'zxcvbnm'] +
+    [(',', ',', '<', 1), ('.', '.', '>', 1), ('/', '/', '?', 1),
+     ('↑', None, None, 1.25), ('Del', None, None, 1.25)],
+    [('Ctrl', None, None, 1.75), ('Alt', None, None, 1.25), ('⟳', None, None, 1.25),
+     ('Space', ' ', ' ', 5.75), ('←', None, None, 1.5), ('↓', None, None, 1.5),
+     ('→', None, None, 1.5)],
+]
+REPEATING = {'⌫', 'Del', '↑', '↓', '←', '→', 'Space'}
+
+
+def sysfs_write(name, value):
+    try:
+        with open(f'{EPDC}/{name}', 'w') as f:
+            f.write(value)
+    except OSError:
+        pass
+
+
+def sysfs_read(name):
+    try:
+        with open(f'{EPDC}/{name}') as f:
+            return int(f.read().strip())
+    except (OSError, ValueError):
+        return 0
+
+
+class Key:
+    def __init__(self, label, normal, shifted, box):
+        self.label, self.normal, self.shifted, self.box = label, normal, shifted, box
+
+
+class Term:
+    def __init__(self):
+        self.font = ImageFont.truetype(FONT, FONT_PX)
+        self.key_font = ImageFont.truetype('/usr/share/fonts/dejavu/DejaVuSans.ttf', 30)
+        self.small_font = ImageFont.truetype('/usr/share/fonts/dejavu/DejaVuSans.ttf', 24)
+        ascent, descent = self.font.getmetrics()
+        self.cw = round(self.font.getlength('M'))
+        self.ch = ascent + descent
+        self.cols = W // self.cw
+        self.rows = (H - KB_H) // self.ch
+        self.x0 = (W - self.cols * self.cw) // 2
+        self.kb_top = H - KB_H
+        self.img = Image.new('L', (W, H), BG)
+        self.draw = ImageDraw.Draw(self.img)
+        self.draw.fontmode = '1'          # no anti-aliasing
+        fd = os.open('/dev/fb0', os.O_RDWR)
+        self.fb = mmap.mmap(fd, FW * FH * 4)
+        os.close(fd)
+        self.screen = pyte.HistoryScreen(self.cols, self.rows, history=2000, ratio=0.5)
+        self.stream = pyte.ByteStream(self.screen)
+        self.keys = self._layout()
+        self.shift = self.caps = self.ctrl = self.alt = False
+        self.pressed = None
+        self.repeat_at = None
+        self.touch = {'x': 0, 'y': 0, 'down': False, 'was_down': False, 'start': None}
+        self.last_cursor = None
+        self.partials = 0
+        self.last_activity = time.monotonic()
+        self.pid = self.master = None
+        self.spawn()
+
+    # ----- shell ---------------------------------------------------------
+    def spawn(self):
+        pid, master = pty.fork()
+        if pid == 0:
+            os.chdir('/root')
+            env = {'HOME': '/root', 'USER': 'root', 'LOGNAME': 'root', 'SHELL': '/bin/sh',
+                   'TERM': 'xterm', 'LANG': 'C.UTF-8',
+                   'PATH': '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'}
+            os.execve('/bin/sh', ['-sh'], env)
+        self.pid, self.master = pid, master
+        fcntl.ioctl(master, termios.TIOCSWINSZ,
+                    struct.pack('HHHH', self.rows, self.cols, self.cols * self.cw,
+                                self.rows * self.ch))
+        os.set_blocking(master, False)
+
+    def send(self, text):
+        if self.master is None:
+            return
+        if self.screen.history.position < self.screen.history.size:
+            self.scroll_to_bottom()
+        try:
+            os.write(self.master, text.encode())
+        except OSError:
+            pass
+
+    def scroll_to_bottom(self):
+        while self.screen.history.position < self.screen.history.size:
+            before = self.screen.history.position
+            self.screen.next_page()
+            if self.screen.history.position == before:
+                break
+        self.screen.dirty.update(range(self.rows))
+
+    # ----- drawing -------------------------------------------------------
+    def blit(self, top, bottom):
+        """Copy portrait rows [top, bottom) to the native framebuffer."""
+        top, bottom = max(0, top), min(H, bottom)
+        if top >= bottom:
+            return
+        part = self.img.crop((0, top, W, bottom)).rotate(90, expand=True)
+        data = part.convert('RGBX').tobytes()
+        width = bottom - top               # native columns top..bottom
+        row_bytes = width * 4
+        for y in range(FH):
+            start = (y * FW + top) * 4
+            self.fb[start:start + row_bytes] = data[y * row_bytes:(y + 1) * row_bytes]
+        self.partials += 1
+
+    def draw_line(self, y):
+        top = y * self.ch
+        self.draw.rectangle((0, top, W - 1, top + self.ch - 1), fill=BG)
+        line = self.screen.buffer[y]
+        cursor = self.screen.cursor
+        show_cursor = (not cursor.hidden and cursor.y == y and
+                       self.screen.history.position >= self.screen.history.size)
+        text = []
+        for x in range(self.cols):
+            char = line[x]
+            inverse = char.reverse != (show_cursor and x == cursor.x)
+            if inverse:
+                left = self.x0 + x * self.cw
+                self.draw.rectangle((left, top, left + self.cw - 1, top + self.ch - 1), fill=FG)
+                self.draw.text((left, top), char.data, font=self.font, fill=BG)
+                text.append(' ')
+            else:
+                text.append(char.data or ' ')
+        self.draw.text((self.x0, top), ''.join(text), font=self.font, fill=FG)
+
+    def render(self):
+        cursor = (self.screen.cursor.x, self.screen.cursor.y)
+        dirty = set(self.screen.dirty)
+        if self.last_cursor != cursor:
+            if self.last_cursor is not None:
+                dirty.add(self.last_cursor[1])
+            dirty.add(cursor[1])
+            self.last_cursor = cursor
+        self.screen.dirty.clear()
+        dirty = sorted(y for y in dirty if 0 <= y < self.rows)
+        if not dirty:
+            return
+        for y in dirty:
+            self.draw_line(y)
+        self.blit(dirty[0] * self.ch, (dirty[-1] + 1) * self.ch)
+
+    def _layout(self):
+        keys = []
+        pad = 6
+        row_h = (KB_H - 2 * pad) // len(ROWS)
+        for r, row in enumerate(ROWS):
+            total = sum(k[3] for k in row)
+            unit = (W - 2 * pad) / total
+            x = pad
+            top = self.kb_top + pad + r * row_h
+            for label, normal, shifted, width in row:
+                box = (round(x), top, round(x + width * unit), top + row_h)
+                keys.append(Key(label, normal, shifted, box))
+                x += width * unit
+        return keys
+
+    def draw_key(self, key, pressed=False):
+        x0, y0, x1, y1 = key.box
+        active = pressed or (key.label == 'Shift' and (self.shift or self.caps)) or \
+            (key.label == 'Ctrl' and self.ctrl) or (key.label == 'Alt' and self.alt)
+        self.draw.rectangle((x0, y0, x1 - 1, y1 - 1), fill=BG)
+        self.draw.rectangle((x0 + 3, y0 + 3, x1 - 4, y1 - 4),
+                            fill=FG if active else BG, outline=FG, width=2)
+        label = key.label
+        if key.normal and key.normal.isalpha() and len(key.normal) == 1 and (self.shift or self.caps):
+            label = key.shifted
+        elif key.shifted and key.shifted != key.normal and self.shift:
+            label = key.shifted
+        if label == 'Shift' and self.caps:
+            label = 'CAPS'
+        font = self.key_font if len(label) == 1 else self.small_font
+        self.draw.text(((x0 + x1) / 2, (y0 + y1) / 2), label, font=font,
+                       fill=BG if active else FG, anchor='mm')
+
+    def draw_keyboard(self):
+        self.draw.rectangle((0, self.kb_top, W - 1, H - 1), fill=BG)
+        self.draw.line((0, self.kb_top + 1, W - 1, self.kb_top + 1), fill=FG, width=2)
+        for key in self.keys:
+            self.draw_key(key)
+        self.blit(self.kb_top, H)
+
+    def redraw_key(self, key, pressed=False):
+        self.draw_key(key, pressed)
+        self.blit(key.box[1], key.box[3])
+
+    def full_redraw(self):
+        self.screen.dirty.update(range(self.rows))
+        self.last_cursor = None
+        self.draw.rectangle((0, 0, W - 1, self.kb_top - 1), fill=BG)
+        self.render()
+        self.draw_keyboard()
+
+    def clean(self):
+        sysfs_write('refresh', 'gc16')
+        self.partials = 0
+
+    # ----- keyboard ------------------------------------------------------
+    def key_at(self, u, v):
+        for key in self.keys:
+            x0, y0, x1, y1 = key.box
+            if x0 <= u < x1 and y0 <= v < y1:
+                return key
+        return None
+
+    def press(self, key):
+        label = key.label
+        mods_before = (self.shift, self.caps, self.ctrl, self.alt)
+        if label == 'Shift':
+            if self.caps:
+                self.caps = self.shift = False
+            elif self.shift:
+                self.caps, self.shift = True, False
+            else:
+                self.shift = True
+        elif label == 'Ctrl':
+            self.ctrl = not self.ctrl
+        elif label == 'Alt':
+            self.alt = not self.alt
+        elif label == '⟳':
+            self.full_redraw()
+            self.clean()
+        else:
+            self.type_key(key)
+            self.shift = False
+            self.ctrl = self.alt = False
+        if (self.shift, self.caps, self.ctrl, self.alt) != mods_before:
+            self.draw_keyboard()
+            if label in ('Shift', 'Ctrl', 'Alt'):
+                return
+        self.redraw_key(key, pressed=True)
+
+    def type_key(self, key):
+        app = DECCKM in self.screen.mode
+        special = {
+            '⌫': '\x7f', 'Tab': '\t', 'Esc': ESC, 'Enter': '\r', 'Del': ESC + '[3~',
+            '↑': ESC + ('OA' if app else '[A'), '↓': ESC + ('OB' if app else '[B'),
+            '→': ESC + ('OC' if app else '[C'), '←': ESC + ('OD' if app else '[D'),
+        }
+        if key.label in special:
+            text = special[key.label]
+        else:
+            upper = self.shift or (self.caps and key.normal.isalpha())
+            text = key.shifted if upper else key.normal
+            if self.ctrl:
+                c = text.upper()
+                if c == ' ':
+                    text = '\x00'
+                elif '@' <= c <= '_':
+                    text = chr(ord(c) & 0x1f)
+        if self.alt:
+            text = ESC + text
+        self.send(text)
+
+    # ----- touch ---------------------------------------------------------
+    def handle_touch(self, data):
+        t = self.touch
+        for _, _, kind, code, value in EVENT.iter_unpack(data):
+            if kind == EV_ABS and code == ABS_X:
+                t['x'] = value
+            elif kind == EV_ABS and code == ABS_Y:
+                t['y'] = value
+            elif kind == EV_KEY and code == BTN_TOUCH:
+                t['down'] = bool(value)
+            elif kind == EV_SYN:
+                # native (x, y) -> portrait (u, v); matches the X desktop CTM
+                u, v = FH - 1 - t['y'], t['x']
+                if t['down'] and not t['was_down']:
+                    self.touch_down(u, v)
+                elif not t['down'] and t['was_down']:
+                    self.touch_up(u, v)
+                t['was_down'] = t['down']
+        self.last_activity = time.monotonic()
+
+    def touch_down(self, u, v):
+        self.touch['start'] = (u, v)
+        if v >= self.kb_top:
+            key = self.key_at(u, v)
+            if key is not None:
+                self.pressed = key
+                self.press(key)
+                self.repeat_at = (time.monotonic() + REPEAT_DELAY
+                                  if key.label in REPEATING else None)
+
+    def touch_up(self, u, v):
+        if self.pressed is not None:
+            self.redraw_key(self.pressed)
+            self.pressed = self.repeat_at = None
+            return
+        start = self.touch['start']
+        if start is None or start[1] >= self.kb_top:
+            return
+        dv = v - start[1]
+        if abs(dv) > 150:
+            # swipe down: older output, swipe up: newer
+            if dv > 0:
+                self.screen.prev_page()
+            else:
+                self.screen.next_page()
+            self.screen.dirty.update(range(self.rows))
+
+    # ----- main loop -----------------------------------------------------
+    def read_shell(self):
+        try:
+            data = os.read(self.master, 65536)
+        except OSError as exc:
+            if exc.errno not in (errno.EIO, errno.EBADF):
+                raise
+            data = b''
+        if not data:
+            self.restart_shell()
+            return
+        self.stream.feed(data)
+        self.last_activity = time.monotonic()
+
+    def restart_shell(self):
+        try:
+            os.close(self.master)
+        except OSError:
+            pass
+        try:
+            os.waitpid(self.pid, 0)
+        except ChildProcessError:
+            pass
+        self.screen.reset()
+        self.spawn()
+        self.full_redraw()
+
+    def run(self):
+        touch = os.open('/dev/input/e60-touch', os.O_RDONLY | os.O_NONBLOCK)
+        self.full_redraw()
+        self.clean()
+        pending_since = None
+        while True:
+            now = time.monotonic()
+            timeouts = [IDLE_CLEAN]
+            if pending_since is not None:
+                timeouts.append(max(0, pending_since + 0.03 - now))
+            if self.repeat_at is not None:
+                timeouts.append(max(0, self.repeat_at - now))
+            ready, _, _ = select.select([self.master, touch], [], [], min(timeouts))
+            if self.master in ready:
+                self.read_shell()
+                pending_since = pending_since or time.monotonic()
+            if touch in ready:
+                try:
+                    self.handle_touch(os.read(touch, EVENT.size * 64))
+                except BlockingIOError:
+                    pass
+                pending_since = pending_since or time.monotonic()
+            now = time.monotonic()
+            if self.repeat_at is not None and now >= self.repeat_at and self.pressed:
+                self.type_key(self.pressed)
+                self.repeat_at = now + REPEAT_RATE
+                pending_since = pending_since or now
+            # Coalesce bursts of output into one update (30 ms, max 150 ms).
+            if pending_since is not None and (not ready or now - pending_since > 0.15):
+                self.render()
+                pending_since = None
+            if (not ready and pending_since is None and self.partials >= CLEAN_AFTER and
+                    now - self.last_activity >= IDLE_CLEAN and not self.touch['down']):
+                self.clean()
+
+
+def main():
+    term = Term()
+
+    def stop(*_):
+        try:
+            os.kill(term.pid, signal.SIGHUP)
+        except OSError:
+            pass
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGHUP, stop)
+    term.run()
+
+
+main()

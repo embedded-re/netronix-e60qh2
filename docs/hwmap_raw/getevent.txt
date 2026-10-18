@@ -1,0 +1,25 @@
+add device 1: /dev/input/event1
+  name:     "zForce-ir-touch"
+  events:
+    KEY (0001): 0102  0133  0134  014a 
+    ABS (0003): 0000  : value 0, min 0, max 1448, fuzz 0, flat 0, resolution 0
+                0001  : value 0, min 0, max 1072, fuzz 0, flat 0, resolution 0
+                0010  : value 0, min 0, max 1448, fuzz 0, flat 0, resolution 0
+                0011  : value 0, min 0, max 1072, fuzz 0, flat 0, resolution 0
+                0018  : value 0, min 0, max 2048, fuzz 0, flat 0, resolution 0
+                0030  : value 0, min 0, max 2, fuzz 0, flat 0, resolution 0
+                0032  : value 0, min 0, max 15, fuzz 0, flat 0, resolution 0
+                0035  : value 0, min 0, max 1448, fuzz 0, flat 0, resolution 0
+                0036  : value 0, min 0, max 1072, fuzz 0, flat 0, resolution 0
+                0039  : value 0, min 1, max 2, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+could not get driver version for /dev/input/mouse0, Not a typewriter
+could not get driver version for /dev/input/mice, Not a typewriter
+add device 2: /dev/input/event0
+  name:     "gpio-keys"
+  events:
+    KEY (0001): 0023  003b  0066  0074 
+    SW  (0005): 0000 
+  input props:
+    <none>

@@ -1,0 +1,35 @@
+           CPU0       
+ 34:          0       GIC  sdma
+ 42:        193       GIC
+ 43:          1       GIC  galcore interrupt service for 2D
+ 55:       8728       GIC  mmc1
+ 56:          0       GIC  mmc2
+ 57:      24910       GIC  mmc0
+ 58:       1562       GIC  IMX-uart
+ 68:         47       GIC  imx-i2c
+ 69:       1914       GIC  imx-i2c
+ 70:      15643       GIC  imx-i2c
+ 75:         41       GIC  usb_wakeup, fsl-usb2-otg, fsl ehci pre interrupt, ehci_hcd:usb1, fsl-usb2-udc
+ 81:          0       GIC  THERMAL_ALARM_IRQ
+ 87:      14486       GIC  i.MX Timer Tick
+112:          0       GIC  imx2-wdt
+129:        230       GIC  fb_dma
+130:        168       GIC  pxp-irq
+174:          1  ricoh619  r5t61x_adc_vsysl
+178:          0  ricoh619  r5t61x_adc_vtherm
+186:          0  ricoh619  r5t61x_adc_vtherm
+196:          0  ricoh619  rtc_ricoh61x
+197:          0  ricoh619  r5t61x_adp_det
+198:          0  ricoh619  r5t61x_usb_det
+203:          1  ricoh619  r5t61x_charger_in
+204:          0  ricoh619  r5t61x_charger_comp
+297:          6      GPIO  tps65185_INT
+301:         51      GPIO  tps65185_PWRGOOD
+344:          0      GPIO  btn home
+347:          0      GPIO  msp430_int
+386:          0      GPIO  mmc1
+390:         92      GPIO  zForce-ir-touch
+392:          0      GPIO  btn power
+395:          2      GPIO  ricoh61x
+396:          0      GPIO  TLE4913
+Err:          0

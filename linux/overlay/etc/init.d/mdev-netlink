@@ -1,0 +1,15 @@
+#!/sbin/openrc-run
+# This kernel disables CONFIG_UEVENT_HELPER; use BusyBox's netlink listener.
+description="BusyBox mdev netlink device manager"
+supervisor=supervise-daemon
+command=/sbin/mdev
+command_args="-df -S"
+depend() {
+    provide dev
+    need sysfs dev-mount
+    before checkfs fsck hwdrivers
+    keyword -containers -vserver -lxc
+}
+start_post() {
+    /sbin/mdev -s
+}

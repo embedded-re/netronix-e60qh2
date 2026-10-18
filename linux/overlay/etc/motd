@@ -1,0 +1,5 @@
+
+ Netronix E60QH2 - mainline Linux (RE build)
+ Notes and stock dumps: /root/re      devmem / i2c-tools / evtest available
+ Waveform: /lib/firmware/imx/epdc/epdc_PENG060D.fw
+

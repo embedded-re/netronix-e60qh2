@@ -1,0 +1,67 @@
+#!/usr/bin/python3
+"""Ghosting cleanup for the E60QH2 desktop.
+
+Partial DU/GC16 updates leave ghosting behind. Once the user stops touching
+the screen for IDLE seconds and at least THRESHOLD updates were queued since
+the screen was last clean, do one full GC16 refresh. Apps that do their own
+full refresh touch CLEAN_STAMP so this daemon does not flash again.
+
+Environment: E60_REFRESH_IDLE (s, default 3), E60_REFRESH_THRESHOLD
+(updates, default 25; 0 disables).
+"""
+import os
+import select
+import struct
+import time
+from pathlib import Path
+
+EPDC = Path('/sys/devices/platform/soc/2000000.bus/20f4000.epdc')
+CLEAN_STAMP = Path('/run/e60-clean')
+IDLE = float(os.environ.get('E60_REFRESH_IDLE', '3'))
+THRESHOLD = int(os.environ.get('E60_REFRESH_THRESHOLD', '25'))
+EVENT = struct.Struct('@llHHi')
+EV_KEY, BTN_TOUCH = 1, 0x14a
+
+
+def updates():
+    return int((EPDC / 'updates').read_text())
+
+
+def stamp():
+    try:
+        return CLEAN_STAMP.stat().st_mtime
+    except OSError:
+        return 0.0
+
+
+def main():
+    if THRESHOLD <= 0:
+        return
+    touch = os.open('/dev/input/e60-touch', os.O_RDONLY | os.O_NONBLOCK)
+    baseline, seen_stamp = updates(), stamp()
+    touching, last_input = False, time.monotonic()
+    while True:
+        timeout = None if touching else max(0.0, last_input + IDLE - time.monotonic())
+        ready, _, _ = select.select([touch], [], [], timeout)
+        if ready:
+            data = os.read(touch, EVENT.size * 64)
+            for _, _, kind, code, value in EVENT.iter_unpack(data):
+                if kind == EV_KEY and code == BTN_TOUCH:
+                    touching = bool(value)
+            last_input = time.monotonic()
+            continue
+        if stamp() != seen_stamp:
+            baseline, seen_stamp = updates(), stamp()
+        if updates() - baseline >= THRESHOLD:
+            try:
+                (EPDC / 'refresh').write_text('gc16')
+                (EPDC / 'wait_idle').read_text()
+            except OSError:
+                pass
+            baseline = updates()
+        # Nothing more to do until the next touch.
+        select.select([touch], [], [])
+        last_input = time.monotonic()
+
+
+main()

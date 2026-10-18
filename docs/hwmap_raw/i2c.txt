@@ -1,0 +1,7 @@
+0-0043 msp430 drv=msp430
+1-0050 zForce-ir-touch drv=zforce-ir-touch
+1-0068 tps65185-1 drv=
+2-0032 ricoh619 drv=ricoh619
+i2c-0 imx-i2c drv=
+i2c-1 imx-i2c drv=
+i2c-2 imx-i2c drv=

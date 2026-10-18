@@ -1,0 +1,350 @@
+#!/usr/bin/python3
+"""Book reader for the E60QH2: PDF, EPUB, MOBI, FB2, CBZ, XPS via mutool.
+
+Tap the right two thirds (or swipe left) for the next page, the left third
+(or swipe right) for the previous one, the top strip for the menu. Pages are
+rendered ahead in a background thread; progress is saved per book.
+"""
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import threading
+import tkinter as tk
+from pathlib import Path
+
+sys.path.insert(0, '/usr/local/lib/e60')
+from e60ui import FONT, Tile, full_refresh, fullscreen  # noqa: E402
+
+BOOKS = Path(os.environ.get('E60_BOOKS', '/mnt/data/books'))
+STATE = Path('/root/.config/e60-reader.json')
+CACHE = Path('/tmp/e60-reader')
+FORMATS = {'.pdf', '.epub', '.mobi', '.fb2', '.cbz', '.xps'}
+FULL_EVERY = 8          # page turns between flashing full refreshes
+AHEAD, BEHIND = 3, 1    # pages kept rendered around the current one
+PER_SCREEN = 8          # library rows per screen
+COUNT_JS = '''var doc = Document.openDocument(scriptArgs[0]);
+if (doc.isReflowable()) doc.layout(+scriptArgs[1], +scriptArgs[2], +scriptArgs[3]);
+print(doc.countPages());
+'''
+
+
+def load_state():
+    try:
+        return json.loads(STATE.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def save_state(state):
+    STATE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = STATE.with_suffix('.tmp')
+    tmp.write_text(json.dumps(state, indent=1))
+    tmp.replace(STATE)
+
+
+class Renderer:
+    """Renders pages of one book to PGM files in a background thread."""
+
+    def __init__(self, path, width, height, font_size):
+        self.path, self.width, self.height = path, width, height
+        # Reflowable books are laid out at half the pixel size in points,
+        # then drawn at 2x, so font_size is roughly in "normal" points.
+        self.layout = [str(width // 2), str(height // 2), str(font_size)]
+        key = hashlib.sha1(f'{path}|{self.layout}|{width}x{height}'.encode()).hexdigest()[:16]
+        self.dir = CACHE / key
+        self.dir.mkdir(parents=True, exist_ok=True)
+        script = CACHE / 'count.js'
+        if not script.exists():
+            script.write_text(COUNT_JS)
+        out = subprocess.run(['mutool', 'run', str(script), str(path), *self.layout],
+                             capture_output=True, text=True, timeout=120)
+        self.pages = int(out.stdout.strip().splitlines()[-1])
+        self.current = 1
+        self.error = None
+        self.cond = threading.Condition()
+        self.closed = False
+        threading.Thread(target=self._work, daemon=True).start()
+
+    def file(self, page):
+        return self.dir / f'{page}.pgm'
+
+    def want(self, page):
+        with self.cond:
+            self.current = page
+            self.cond.notify()
+
+    def close(self):
+        with self.cond:
+            self.closed = True
+            self.cond.notify()
+
+    def _missing(self):
+        lo = max(1, self.current - BEHIND)
+        hi = min(self.pages, self.current + AHEAD)
+        for page in [self.current, *range(self.current + 1, hi + 1), *range(lo, self.current)]:
+            if not self.file(page).exists():
+                return page, lo, hi
+        return None, lo, hi
+
+    def _work(self):
+        while True:
+            with self.cond:
+                while not self.closed and self._missing()[0] is None:
+                    self.cond.wait()
+                if self.closed:
+                    return
+                first, lo, hi = self._missing()
+            # Render a contiguous run of missing pages in one mutool call.
+            last = first
+            while last < hi and last - first < 2 and not self.file(last + 1).exists():
+                last += 1
+            cmd = ['mutool', 'draw', '-q', '-c', 'gray', '-w', str(self.width),
+                   '-h', str(self.height), '-W', self.layout[0], '-H', self.layout[1],
+                   '-S', self.layout[2], '-o', str(self.dir / 'tmp-%d.pgm'),
+                   str(self.path), f'{first}-{last}']
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            for page in range(first, last + 1):
+                tmp = self.dir / f'tmp-{page}.pgm'
+                if tmp.exists():
+                    tmp.replace(self.file(page))
+            if not self.file(first).exists():
+                self.error = (result.stderr.strip() or 'render failed')[-200:]
+                return
+            for old in self.dir.glob('*.pgm'):
+                stem = old.stem
+                if stem.isdigit() and not lo <= int(stem) <= hi:
+                    old.unlink(missing_ok=True)
+
+
+class Reader:
+    def __init__(self):
+        self.root = tk.Tk(className='e60-reader')
+        fullscreen(self.root, 'Books')
+        self.root.update_idletasks()
+        self.width = self.root.winfo_screenwidth()
+        self.height = self.root.winfo_screenheight()
+        self.state = load_state()
+        self.state.setdefault('pages', {})
+        self.state.setdefault('font', 13)
+        self.renderer = None
+        self.book = None
+        self.page = 1
+        self.turns = 0
+        self.photo = None
+        self.press = None
+        self.menu_shown = False
+        self.library_offset = 0
+        self.library = tk.Frame(self.root)
+        self.view = tk.Canvas(self.root, bg='white', highlightthickness=0, bd=0)
+        self.view.bind('<ButtonPress-1>', self._press)
+        self.view.bind('<ButtonRelease-1>', self._release)
+        self.image_item = self.view.create_image(self.width // 2, self.height // 2)
+        self.message = self.view.create_text(self.width // 2, self.height // 2,
+                                             font=(FONT, 26), width=self.width - 120)
+        self.menu = self._build_menu()
+        self.show_library()
+
+    # ----- library -------------------------------------------------------
+    def books(self):
+        if not BOOKS.is_dir():
+            return []
+        return sorted((p for p in BOOKS.rglob('*') if p.suffix.lower() in FORMATS),
+                      key=lambda p: p.name.lower())
+
+    def show_library(self):
+        self.close_book()
+        self.view.pack_forget()
+        for child in self.library.winfo_children():
+            child.destroy()
+        self.library.pack(fill='both', expand=True, padx=40, pady=30)
+        head = tk.Frame(self.library)
+        head.pack(fill='x', pady=(10, 20))
+        tk.Label(head, text='Books', font=(FONT, 40, 'bold')).pack(side='left')
+        Tile(head, 'Close', self.root.destroy, size=22, padx=30, pady=10).pack(side='right')
+        books = self.books()
+        if not books:
+            tk.Label(self.library, text=f'No books found.\n\nCopy PDF or EPUB files to\n{BOOKS}',
+                     font=(FONT, 24), justify='center').pack(expand=True)
+            return
+        self.library_offset = min(self.library_offset, (len(books) - 1) // PER_SCREEN * PER_SCREEN)
+        shown = books[self.library_offset:self.library_offset + PER_SCREEN]
+        rows = tk.Frame(self.library)
+        rows.pack(fill='both', expand=True)
+        for path in shown:
+            page = self.state['pages'].get(str(path), {}).get('page')
+            title = path.stem if len(path.stem) <= 34 else path.stem[:33] + '…'
+            text = title + (f'\np. {page}' if page else '\nnew')
+            tile = Tile(rows, text, lambda p=path: self.open_book(p), size=22,
+                        anchor='w', justify='left', padx=24)
+            tile.pack(fill='both', expand=True, pady=8)
+        for _ in range(PER_SCREEN - len(shown)):
+            tk.Frame(rows).pack(fill='both', expand=True, pady=8)
+        nav = tk.Frame(self.library)
+        nav.pack(fill='x', pady=(16, 0))
+        screens = (len(books) - 1) // PER_SCREEN + 1
+        here = self.library_offset // PER_SCREEN + 1
+        if here > 1:
+            Tile(nav, '◀  Prev', lambda: self._library_page(-1), size=22, pady=12
+                 ).pack(side='left', fill='x', expand=True, padx=(0, 10))
+        tk.Label(nav, text=f'{here} / {screens}', font=(FONT, 20)).pack(side='left', padx=20)
+        if here < screens:
+            Tile(nav, 'Next  ▶', lambda: self._library_page(1), size=22, pady=12
+                 ).pack(side='left', fill='x', expand=True, padx=(10, 0))
+
+    def _library_page(self, delta):
+        self.library_offset = max(0, self.library_offset + delta * PER_SCREEN)
+        self.show_library()
+
+    # ----- reading -------------------------------------------------------
+    def open_book(self, path):
+        self.library.pack_forget()
+        self.view.pack(fill='both', expand=True)
+        self.view.itemconfigure(self.image_item, image='')
+        self.view.itemconfigure(self.message, text=f'Opening\n{path.stem}…', state='normal')
+        self.root.update()
+        try:
+            self.renderer = Renderer(path, self.width, self.height, self.state['font'])
+        except (OSError, ValueError, IndexError, subprocess.SubprocessError) as exc:
+            self.view.itemconfigure(self.message, text=f'Cannot open {path.name}\n{exc}')
+            self.root.after(3000, self.show_library)
+            return
+        self.book = path
+        saved = self.state['pages'].get(str(path), {})
+        self.page = min(max(1, saved.get('page', 1)), self.renderer.pages)
+        # The first page shown gets a clean full refresh.
+        self.turns = FULL_EVERY
+        self.goto(self.page)
+
+    def close_book(self):
+        self.hide_menu()
+        if self.renderer is not None:
+            self.renderer.close()
+            self.renderer = None
+        self.book = None
+
+    def goto(self, page):
+        if self.renderer is None:
+            return
+        page = min(max(1, page), self.renderer.pages)
+        if page != self.page:
+            self.turns += 1
+        self.page = page
+        self.state['pages'][str(self.book)] = {'page': page, 'of': self.renderer.pages}
+        save_state(self.state)
+        self.renderer.want(page)
+        self._show_when_ready(page)
+
+    def _show_when_ready(self, page):
+        if self.renderer is None or page != self.page:
+            return
+        if self.renderer.error:
+            self.view.itemconfigure(self.message, text=self.renderer.error, state='normal')
+            return
+        path = self.renderer.file(page)
+        if not path.exists():
+            self.view.itemconfigure(self.message, text='…', state='normal')
+            self.root.after(100, self._show_when_ready, page)
+            return
+        try:
+            self.photo = tk.PhotoImage(file=str(path))
+        except tk.TclError:
+            self.root.after(100, self._show_when_ready, page)
+            return
+        self.view.itemconfigure(self.message, state='hidden')
+        self.view.itemconfigure(self.image_item, image=self.photo)
+        self._update_menu_label()
+        if self.turns >= FULL_EVERY:
+            self.turns = 0
+            self.root.update_idletasks()
+            self.root.after(250, full_refresh)
+
+    def _press(self, event):
+        self.press = (event.x, event.y)
+
+    def _release(self, event):
+        if self.press is None:
+            return
+        x0, y0 = self.press
+        self.press = None
+        dx, dy = event.x - x0, event.y - y0
+        if abs(dx) > 120 and abs(dx) > 2 * abs(dy):
+            self.goto(self.page + (1 if dx < 0 else -1))
+        elif abs(dx) < 60 and abs(dy) < 60:
+            if y0 < self.height * 0.1:
+                self.toggle_menu()
+            elif self.menu_shown:
+                self.hide_menu()
+            elif x0 < self.width / 3:
+                self.goto(self.page - 1)
+            else:
+                self.goto(self.page + 1)
+
+    # ----- menu ----------------------------------------------------------
+    def _build_menu(self):
+        menu = tk.Frame(self.view, highlightthickness=3, highlightbackground='black')
+        top = tk.Frame(menu)
+        top.pack(fill='x', padx=16, pady=(16, 8))
+        self.menu_label = tk.Label(top, font=(FONT, 22))
+        self.menu_label.pack(side='left', padx=8)
+        Tile(top, 'Library', self.show_library, size=22, padx=24, pady=8).pack(side='right')
+        row = tk.Frame(menu)
+        row.pack(fill='x', padx=16, pady=(8, 16))
+        buttons = [('−10', lambda: self.goto(self.page - 10)),
+                   ('+10', lambda: self.goto(self.page + 10)),
+                   ('A−', lambda: self.set_font(-1)),
+                   ('A+', lambda: self.set_font(1)),
+                   ('Clean', full_refresh)]
+        for label, action in buttons:
+            Tile(row, label, action, size=22, pady=14).pack(
+                side='left', fill='x', expand=True, padx=6)
+        return menu
+
+    def _update_menu_label(self):
+        if self.renderer is not None:
+            name = self.book.stem if len(self.book.stem) <= 28 else self.book.stem[:27] + '…'
+            self.menu_label.configure(text=f'{name}   ·   {self.page} / {self.renderer.pages}')
+
+    def toggle_menu(self):
+        if self.menu_shown:
+            self.hide_menu()
+        else:
+            self._update_menu_label()
+            self.menu.place(x=0, y=0, width=self.width)
+            self.menu_shown = True
+
+    def hide_menu(self):
+        if self.menu_shown:
+            self.menu.place_forget()
+            self.menu_shown = False
+
+    def set_font(self, delta):
+        if self.renderer is None or self.book.suffix.lower() == '.pdf':
+            return
+        size = min(24, max(6, self.state['font'] + delta))
+        if size == self.state['font']:
+            return
+        # Keep roughly the same position in the book after reflow.
+        fraction = (self.page - 1) / max(1, self.renderer.pages)
+        self.state['font'] = size
+        book = self.book
+        self.close_book()
+        self.open_book(book)
+        if self.renderer is not None:
+            self.goto(1 + round(fraction * self.renderer.pages))
+
+
+def main():
+    CACHE.mkdir(parents=True, exist_ok=True)
+    reader = Reader()
+    try:
+        reader.root.mainloop()
+    finally:
+        if reader.renderer is not None:
+            reader.renderer.close()
+        shutil.rmtree(CACHE, ignore_errors=True)
+
+
+main()

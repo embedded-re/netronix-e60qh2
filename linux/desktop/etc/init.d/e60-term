@@ -1,0 +1,15 @@
+#!/sbin/openrc-run
+description="E60QH2 e-ink terminal with on-screen keyboard"
+command="/usr/local/bin/e60-term"
+supervisor=supervise-daemon
+respawn_delay=2
+respawn_max=0
+output_log="/var/log/e60-term.log"
+error_log="/var/log/e60-term.log"
+depend() {
+    need localmount
+    after modules
+}
+start_pre() {
+    /usr/local/bin/e60-inputs
+}

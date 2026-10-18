@@ -1,0 +1,9 @@
+#!/bin/sh
+# One-time setup: run the package scripts skipped during the host build,
+# grow the root filesystem to the full partition.
+[ -e /etc/.firstboot-done ] && exit 0
+echo "firstboot: re-running package install scripts from cache"
+apk fix --reinstall $(apk info -q) >/var/log/firstboot-apk.log 2>&1
+echo "firstboot: growing rootfs"
+resize2fs /dev/mmcblk1p2 >/var/log/firstboot-resize.log 2>&1
+touch /etc/.firstboot-done

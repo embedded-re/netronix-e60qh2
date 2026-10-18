@@ -1,0 +1,25 @@
+regulator.0|dummy|||0|
+regulator.1|vddpu|700000|disabled|0|anatop_reg.0
+regulator.10|RICOH619_DC4|1200000|enabled|0|ricoh61x-regulator.3
+regulator.11|RICOH619_DC5|1800000|enabled|0|ricoh61x-regulator.4
+regulator.12|RICOH619_LDO1|3300000|enabled|0|ricoh61x-regulator.5
+regulator.13|RICOH619_LDO2|3300000|enabled|0|ricoh61x-regulator.6
+regulator.14|RICOH619_LDO3|1200000|enabled|0|ricoh61x-regulator.7
+regulator.15|RICOH619_LDO4|1200000|disabled|0|ricoh61x-regulator.8
+regulator.16|RICOH619_LDO5|3300000|enabled|0|ricoh61x-regulator.9
+regulator.17|RICOH619_LDO6|600000|enabled|0|ricoh61x-regulator.10
+regulator.18|RICOH619_LDO7|3300000|disabled|0|ricoh61x-regulator.11
+regulator.19|RICOH619_LDO8|1800000|enabled|1|ricoh61x-regulator.12
+regulator.2|vddcore|1250000|enabled|0|anatop_reg.1
+regulator.20|RICOH619_LDO9|1200000|disabled|0|ricoh61x-regulator.13
+regulator.21|RICOH619_LDO10|1400000|disabled|0|ricoh61x-regulator.14
+regulator.22|RICOH619_LDORTC1|3300000|enabled|0|ricoh61x-regulator.15
+regulator.23|RICOH619_LDORTC2|3300000|disabled|0|ricoh61x-regulator.16
+regulator.3|vddsoc|1150000|enabled|0|anatop_reg.2
+regulator.4|vdd2p5|2400000|enabled|0|anatop_reg.3
+regulator.5|vdd1p1|1100000|enabled|0|anatop_reg.4
+regulator.6|vdd3p0|3200000|enabled|1|anatop_reg.5
+regulator.7|RICOH619_DC1|1400000|enabled|0|ricoh61x-regulator.0
+regulator.8|RICOH619_DC2|3300000|enabled|0|ricoh61x-regulator.1
+regulator.9|RICOH619_DC3|1425000|enabled|0|ricoh61x-regulator.2
+/sys/kernel/debug/regulator/supply_map: No such file or directory

@@ -1,0 +1,49 @@
+Character devices:
+  1 mem
+  2 pty
+  3 ttyp
+  5 /dev/tty
+  5 /dev/console
+  5 /dev/ptmx
+ 10 misc
+ 13 input
+ 29 fb
+ 66 fsl-usb2-otg
+ 81 video4linux
+ 89 i2c
+108 ppp
+116 alsa
+128 ptm
+136 pts
+166 ttyACM
+180 usb
+188 ttyUSB
+189 usb_device
+199 galcore
+207 ttymxc
+252 hidraw
+253 ttyGS
+254 rtc
+
+Block devices:
+  1 ramdisk
+259 blkext
+  7 loop
+  8 sd
+ 65 sd
+ 66 sd
+ 67 sd
+ 68 sd
+ 69 sd
+ 70 sd
+ 71 sd
+128 sd
+129 sd
+130 sd
+131 sd
+132 sd
+133 sd
+134 sd
+135 sd
+179 mmc
+254 device-mapper

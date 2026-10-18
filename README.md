@@ -7,6 +7,13 @@ documents the hardware and the stock firmware, and ports mainline Linux to it.
 The port uses Linux 7.2 and Alpine 3.24 from the microSD, and leaves the eMMC
 with stock Android untouched.
 
+![DIBUK Saga e-reader on its retail boxes](docs/images/dibuk-saga.png)
+
+It was sold as the **DIBUK Saga**, an e-reader paired with the DIBUK e-book
+store and "powered by" Telekom. The
+[product page from LB Studio](https://www.lbstudio.sk/dibuk) shows what it was
+meant to be.
+
 ## Status
 
 Working on the hardware (2026-10-18): boot from the stock U-Boot, eMMC and
